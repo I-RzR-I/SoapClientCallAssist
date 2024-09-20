@@ -1,0 +1,60 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.10.35201.131
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "shared", "shared", "{BCB2B36F-30D2-4B00-802B-52BDB4CB9E0F}"
+	ProjectSection(SolutionItems) = preProject
+		shared\GeneralAssemblyInfo.cs = shared\GeneralAssemblyInfo.cs
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{E737BE4D-6DFF-4A67-A3D9-2AC58BFBBC07}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{B0B98BC9-8BCC-4788-BF9A-01CC73D1AEFF}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoapClientCallAssist", "SoapClientCallAssist\SoapClientCallAssist.csproj", "{C709A7BD-9C3C-42C9-9340-52FB8C2461C3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SoapClientCallAssistTests", "tests\SoapClientCallAssistTests\SoapClientCallAssistTests.csproj", "{4F5CA658-3AA2-43E1-B9A5-6F66D0E6228F}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleSoapCallTest", "tests\ConsoleSoapCallTest\ConsoleSoapCallTest.csproj", "{95B47C71-800F-43E6-85EA-22DEFE408E49}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C709A7BD-9C3C-42C9-9340-52FB8C2461C3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C709A7BD-9C3C-42C9-9340-52FB8C2461C3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C709A7BD-9C3C-42C9-9340-52FB8C2461C3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C709A7BD-9C3C-42C9-9340-52FB8C2461C3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4F5CA658-3AA2-43E1-B9A5-6F66D0E6228F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4F5CA658-3AA2-43E1-B9A5-6F66D0E6228F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4F5CA658-3AA2-43E1-B9A5-6F66D0E6228F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4F5CA658-3AA2-43E1-B9A5-6F66D0E6228F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95B47C71-800F-43E6-85EA-22DEFE408E49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95B47C71-800F-43E6-85EA-22DEFE408E49}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95B47C71-800F-43E6-85EA-22DEFE408E49}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95B47C71-800F-43E6-85EA-22DEFE408E49}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4F5CA658-3AA2-43E1-B9A5-6F66D0E6228F} = {E737BE4D-6DFF-4A67-A3D9-2AC58BFBBC07}
+		{95B47C71-800F-43E6-85EA-22DEFE408E49} = {E737BE4D-6DFF-4A67-A3D9-2AC58BFBBC07}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		BuildVersion_UseUniversalClock = True
+		BuildVersion_ConfigurationName = Release
+		BuildVersion_AssemblyInfoFilename = shared\GeneralAssemblyInfo.cs
+		BuildVersion_StartDate = 2024/9/9
+		BuildVersion_UpdateFileVersion = True
+		BuildVersion_UpdateAssemblyVersion = True
+		BuildVersion_BuildVersioningStyle = None.None.Increment.TimeStamp
+		SolutionGuid = {4B5BD8B8-58AD-47B4-B85A-E7242D47B9FE}
+	EndGlobalSection
+EndGlobal
