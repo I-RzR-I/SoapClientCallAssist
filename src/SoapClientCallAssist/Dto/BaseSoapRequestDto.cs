@@ -160,12 +160,12 @@ namespace SoapClientCallAssist.Dto
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        ///     Gets or sets a value indicating whether the build get request as REST.
+        ///     Gets or sets a value indicating whether the build get request as parametrized URL with slash.
         /// </summary>
         /// <value>
-        ///     True if build get request as rest, false if not.
+        ///     True if build get request as URL with slash between params, false if not.
         /// </value>
         /// =================================================================================================
-        public bool BuildGetRequestAsRest { get; set; } = false;
+        public bool BuildGetRequestAsSlashUrl { get; set; } = false;
     }
 }
