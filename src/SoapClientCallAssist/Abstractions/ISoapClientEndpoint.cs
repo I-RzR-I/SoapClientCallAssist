@@ -49,7 +49,7 @@ namespace SoapClientCallAssist.Abstractions
         /// <param name="action">(Optional) The action. SOAP Action.</param>
         /// <param name="ownSoapEnvelopeAttributes">(Optional) The own defined SOAP Envelope attributes.</param>
         /// <param name="httpClientHeaders">(Optional) The HTTP client header variables.</param>
-        /// <param name="buildGetRequestAsRest">Build current SOAP GET request as REST ex: 'http:/site.local/GetDocuments/1'</param>
+        /// <param name="buildGetRequestAsSlashUrl">Build current SOAP GET request as URL with separated param by slash ex: 'http:/site.local/GetDocuments/1'</param>
         /// <returns>
         ///     An IResult&lt;HttpRequestMessage&gt;
         /// </returns>
@@ -63,7 +63,7 @@ namespace SoapClientCallAssist.Abstractions
             string action = null,
             IEnumerable<XAttribute> ownSoapEnvelopeAttributes = null,
             Dictionary<string, IEnumerable<string>> httpClientHeaders = null,
-            bool buildGetRequestAsRest = false);
+            bool buildGetRequestAsSlashUrl = false);
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>

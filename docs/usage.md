@@ -87,7 +87,7 @@ Available SOAP protocols (enum: `SoapProtocolType`):
 				<b>string action</b> -> The current method action URL.<br/>
 				<b> IEnumerable&lt;XAttribute&gt; ownSoapEnvelopeAttributes</b> -> SOAP Envelope additional defined attributes.<br/>
 				<b>Dictionary&lt;string, IEnumerable&lt;string&gt;&gt; httpClientHeaders</b> -> HTTP client custom header variables.<br/>
-				<b>bool buildGetRequestAsRest</b> -> Indicates that if the HTTP method is GET, then the current request will be generated as normal SOAP or as REST.<br/>
+				<b>bool buildGetRequestAsSlashUrl</b> -> Indicates that if the HTTP method is GET, then the current request will be generated as normal SOAP or as URL with slash between params.<br/>
 			</td>
 		</tr>
 		<tr>

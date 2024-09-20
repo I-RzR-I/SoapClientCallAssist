@@ -69,7 +69,7 @@ namespace SoapClientCallAssist.Client
             string action = null,
             IEnumerable<XAttribute> ownSoapEnvelopeAttributes = null,
             Dictionary<string, IEnumerable<string>> httpClientHeaders = null,
-            bool buildGetRequestAsRest = false)
+            bool buildGetRequestAsSlashUrl = false)
         {
             try
             {
@@ -87,7 +87,7 @@ namespace SoapClientCallAssist.Client
                         SoapUri = endpoint,
                         OwnSoapEnvelopeAttributes = ownSoapEnvelopeAttributes,
                         HttpClientHeaders = httpClientHeaders,
-                        BuildGetRequestAsRest = buildGetRequestAsRest
+                        BuildGetRequestAsSlashUrl = buildGetRequestAsSlashUrl
                     });
 
                 return requestMessage.IsSuccess.IsFalse() 

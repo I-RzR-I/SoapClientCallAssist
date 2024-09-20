@@ -180,7 +180,7 @@ namespace SoapClientCallAssist.Client
                 if (soapRequest.Method == HttpMethod.Get)
                 {
                     var getRequest = SoapXmlHelper.VerifyAndBuildGetSegment(soapRequest.Method, soapRequest.SoapUri,
-                        soapRequest.Bodies, soapRequest.BuildGetRequestAsRest);
+                        soapRequest.Bodies, soapRequest.BuildGetRequestAsSlashUrl);
                     if (getRequest.IsSuccess.IsFalse())
                         return Result<HttpRequestMessage>.Failure(getRequest.GetFirstMessageWithDetails());
 

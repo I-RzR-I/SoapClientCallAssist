@@ -47,13 +47,13 @@ namespace SoapClientCallAssist.Helper
         /// <param name="method">The method.</param>
         /// <param name="soapUri">URI of the SOAP.</param>
         /// <param name="bodies">The bodies.</param>
-        /// <param name="buildGetRequestAsRest">Build current SOAP GET request as REST ex: 'http:/site.local/GetDocuments/1'</param>
+        /// <param name="buildGetRequestAsSlashUrl">Build current SOAP GET request as URL with slash ex: 'http:/site.local/GetDocuments/1'</param>
         /// <returns>
         ///     An IResult&lt;HttpRequestMessage&gt;
         /// </returns>
         /// =================================================================================================
         internal static IResult<HttpRequestMessage> VerifyAndBuildGetSegment(HttpMethod method, Uri soapUri,
-            IEnumerable<XElement> bodies, bool buildGetRequestAsRest = false)
+            IEnumerable<XElement> bodies, bool buildGetRequestAsSlashUrl = false)
         {
             if (method == HttpMethod.Get)
             {
@@ -64,7 +64,7 @@ namespace SoapClientCallAssist.Helper
                     var param = ((XElement)node).Name;
                     var val = ((XElement)node).Value;
 
-                    paramsUri = buildGetRequestAsRest.IsTrue()
+                    paramsUri = buildGetRequestAsSlashUrl.IsTrue()
                         ? $"{paramsUri}/{val}"
                         : paramsUri.AddQueryString($"{param.LocalName}={val}");
                 }
