@@ -18,7 +18,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SoapClientCallAssist;
 using SoapClientCallAssist.Abstractions;
-using SoapClientCallAssist.Dto.Public;
 using SoapClientCallAssist.Enums;
 using System;
 using System.Collections.Generic;
@@ -62,41 +61,6 @@ namespace SoapClientCallAssistTests
                         new XElement("idV2", "s12")
                         )
                 });
-            Assert.IsNotNull(soapRequest);
-            Assert.IsTrue(soapRequest.IsSuccess);
-            Assert.IsNotNull(soapRequest.Response);
-
-            var soapCall = client.SendRequest(soapRequest.Response);
-
-            Assert.IsNotNull(soapCall);
-            Assert.IsTrue(soapCall.IsSuccess);
-            Assert.IsNotNull(soapCall.Response);
-            Assert.AreEqual(HttpStatusCode.OK, soapCall.Response.StatusCode);
-
-            var response = soapCall.Response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
-            Assert.IsNotNull(response);
-            Assert.AreEqual("<?xml version=\"1.0\" encoding=\"utf-8\"?>\r\n<int xmlns=\"http://SoapClientCallAssist.local/\">1</int>", response);
-        }
-
-        [TestMethod]
-        public void CallIsValidInHttpGetWithNameInBodies_v2()
-        {
-            var client = _clientFactory(SoapProtocolType.SOAP_1_1);
-            var ns = XNamespace.Get("http://SoapClientCallAssist.local/");
-
-            var soapRequest = client.BuildRequest(
-                HttpMethod.Get,
-                new BuildSoapRequestDto(new HttpClientDto(_baseUri),
-                    new SoapEnvelopeDto(
-                        new List<XElement>()
-                        {
-                            new XElement("IsValid",
-                                new XElement("id", "s1"),
-                                new XElement("idV2", "s12"))
-                        }
-                    ))
-            );
-
             Assert.IsNotNull(soapRequest);
             Assert.IsTrue(soapRequest.IsSuccess);
             Assert.IsNotNull(soapRequest.Response);

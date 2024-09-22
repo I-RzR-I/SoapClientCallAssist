@@ -25,7 +25,6 @@ using DomainCommonExtensions.CommonExtensions.TypeParam;
 using DomainCommonExtensions.DataTypeExtensions;
 using Microsoft.Extensions.DependencyInjection;
 using SoapClientCallAssist.Abstractions;
-using SoapClientCallAssist.Dto;
 using SoapClientCallAssist.Enums;
 using SoapClientCallAssist.Helper;
 using System;
@@ -41,6 +40,7 @@ using System.Xml.Linq;
 using Messages = SoapClientCallAssist.Helper.DefaultResultMessageHelper;
 using MessageCodes = SoapClientCallAssist.Enums.MessageCodesType;
 using System.Xml;
+using SoapClientCallAssist.Dto;
 
 #endregion
 
