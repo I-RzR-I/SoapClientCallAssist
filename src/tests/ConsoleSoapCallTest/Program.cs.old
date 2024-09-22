@@ -1,12 +1,10 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using SoapClientCallAssist;
 using SoapClientCallAssist.Abstractions;
-using SoapClientCallAssist.Dto.Public;
 using SoapClientCallAssist.Enums;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
-using System.Text;
 using System.Xml.Linq;
 
 #pragma disable CS0017
@@ -26,11 +24,8 @@ namespace ConsoleSoapCallTest
            var clientFactory = sp.GetRequiredService<Func<SoapProtocolType, ISoapClientEndpoint>>();
 
            var client = clientFactory(SoapProtocolType.SOAP_1_1);
-           client.BuildRequest(HttpMethod.Post, 
-               new BuildSoapRequestDto()
-               {
-                   Client = new HttpClientDto(new Uri("http://env.local"), Encoding.UTF8)
-               });
+           var request = client.BuildRequest(HttpMethod.Post, new Uri("http://env.local"),
+               new List<XElement>());
 
            Console.ReadKey();
         }

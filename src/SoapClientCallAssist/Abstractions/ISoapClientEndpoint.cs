@@ -17,6 +17,7 @@
 #region U S A G E S
 
 using AggregatedGenericResultMessage.Abstractions;
+using SoapClientCallAssist.Dto.Public;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -47,9 +48,14 @@ namespace SoapClientCallAssist.Abstractions
         /// <param name="headers">(Optional) The headers. SOAP request headers.</param>
         /// <param name="bodyEncoding">(Optional) The body encoding. Default encoding is UTF8.</param>
         /// <param name="action">(Optional) The action. SOAP Action.</param>
-        /// <param name="ownSoapEnvelopeAttributes">(Optional) The own defined SOAP Envelope attributes.</param>
+        /// <param name="ownSoapEnvelopeAttributes">
+        ///     (Optional) The own defined SOAP Envelope attributes.
+        /// </param>
         /// <param name="httpClientHeaders">(Optional) The HTTP client header variables.</param>
-        /// <param name="buildGetRequestAsSlashUrl">Build current SOAP GET request as URL with separated param by slash ex: 'http:/site.local/GetDocuments/1'</param>
+        /// <param name="buildGetRequestAsSlashUrl">
+        ///     (Optional) Build current SOAP GET request as URL with separated param by slash ex:
+        ///     'http:/site.local/GetDocuments/1'.
+        /// </param>
         /// <returns>
         ///     An IResult&lt;HttpRequestMessage&gt;
         /// </returns>
@@ -64,6 +70,20 @@ namespace SoapClientCallAssist.Abstractions
             IEnumerable<XAttribute> ownSoapEnvelopeAttributes = null,
             Dictionary<string, IEnumerable<string>> httpClientHeaders = null,
             bool buildGetRequestAsSlashUrl = false);
+
+        /// -------------------------------------------------------------------------------------------------
+        /// <summary>
+        ///     Sends a request.
+        /// </summary>
+        /// <param name="method">The HTTP method.</param>
+        /// <param name="soapRequest">.</param>
+        /// <returns>
+        ///     An IResult&lt;HttpRequestMessage&gt;
+        /// </returns>
+        /// =================================================================================================
+        IResult<HttpRequestMessage> BuildRequest(
+            HttpMethod method,
+            BuildSoapRequestDto soapRequest);
 
         /// -------------------------------------------------------------------------------------------------
         /// <summary>

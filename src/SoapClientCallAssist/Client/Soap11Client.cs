@@ -23,6 +23,7 @@ using DomainCommonExtensions.CommonExtensions;
 using DomainCommonExtensions.DataTypeExtensions;
 using SoapClientCallAssist.Abstractions;
 using SoapClientCallAssist.Dto;
+using SoapClientCallAssist.Dto.Public;
 using SoapClientCallAssist.Enums;
 using SoapClientCallAssist.Helper;
 using System;
@@ -73,25 +74,61 @@ namespace SoapClientCallAssist.Client
         {
             try
             {
+                var requestMessage = BuildRequest(
+                    method,
+                    new BuildSoapRequestDto(
+                        new HttpClientDto()
+                        {
+                            BodyEncoding = bodyEncoding,
+                            BuildGetRequestAsSlashUrl = buildGetRequestAsSlashUrl,
+                            Endpoint = endpoint,
+                            HttpClientHeaders = httpClientHeaders
+                        },
+                        new SoapEnvelopeDto()
+                        {
+                            Bodies = bodies,
+                            Headers = headers,
+                            OwnSoapEnvelopeAttributes = ownSoapEnvelopeAttributes,
+                            Action = action
+                        }
+                        ));
+
+                return requestMessage.IsSuccess.IsFalse()
+                    ? Result<HttpRequestMessage>.Failure(requestMessage.GetFirstMessage())
+                    : Result<HttpRequestMessage>.Success(requestMessage.Response);
+            }
+            catch (Exception e)
+            {
+                return Result<HttpRequestMessage>
+                    .Failure(MessageCodesType.ER_S11_BSR.GetDescription(), DefaultResultMessageHelper.ErrorMessages[MessageCodesType.ER_S11_BSR])
+                    .WithError(e);
+            }
+        }
+
+        /// <inheritdoc />
+        public IResult<HttpRequestMessage> BuildRequest(HttpMethod method, BuildSoapRequestDto soapRequest)
+        {
+            try
+            {
                 var requestMessage = BuildSoapRequestMessage(
                     new BaseSoapRequestDto
                     {
                         Method = method,
                         MediaType = SoapMediaType.Soap11.GetDescription(),
-                        Action = action,
-                        Bodies = bodies,
-                        BodyEncoding = bodyEncoding,
-                        Headers = headers,
+                        Action = soapRequest.Envelope.Action,
+                        Bodies = soapRequest.Envelope.Bodies,
+                        BodyEncoding = soapRequest.Client.BodyEncoding,
+                        Headers = soapRequest.Envelope.Headers,
                         SoapNameSpaceEnvelope = SoapNamespaceType.Soap11.GetDescription(),
                         SoapProtocol = SoapProtocolType.SOAP_1_1,
-                        SoapUri = endpoint,
-                        OwnSoapEnvelopeAttributes = ownSoapEnvelopeAttributes,
-                        HttpClientHeaders = httpClientHeaders,
-                        BuildGetRequestAsSlashUrl = buildGetRequestAsSlashUrl
+                        SoapUri = soapRequest.Client.Endpoint,
+                        OwnSoapEnvelopeAttributes = soapRequest.Envelope.OwnSoapEnvelopeAttributes,
+                        HttpClientHeaders = soapRequest.Client.HttpClientHeaders,
+                        BuildGetRequestAsSlashUrl = soapRequest.Client.BuildGetRequestAsSlashUrl
                     });
-               
-                return requestMessage.IsSuccess.IsFalse() 
-                    ? Result<HttpRequestMessage>.Failure(requestMessage.GetFirstMessage()) 
+
+                return requestMessage.IsSuccess.IsFalse()
+                    ? Result<HttpRequestMessage>.Failure(requestMessage.GetFirstMessage())
                     : Result<HttpRequestMessage>.Success(requestMessage.Response);
             }
             catch (Exception e)
@@ -108,9 +145,9 @@ namespace SoapClientCallAssist.Client
             try
             {
                 var soapResult = base.SendRequest(request, _clientTimeOut);
-                
-                return soapResult.IsSuccess.IsFalse() 
-                    ? Result<HttpResponseMessage>.Failure(soapResult.GetFirstMessage()) 
+
+                return soapResult.IsSuccess.IsFalse()
+                    ? Result<HttpResponseMessage>.Failure(soapResult.GetFirstMessage())
                     : Result<HttpResponseMessage>.Success(soapResult.Response);
             }
             catch (Exception e)
@@ -128,9 +165,9 @@ namespace SoapClientCallAssist.Client
             try
             {
                 var soapResult = await base.SendRequestAsync(request, _clientTimeOut, cancellationToken);
-                
-                return soapResult.IsSuccess.IsFalse() 
-                    ? Result<HttpResponseMessage>.Failure(soapResult.GetFirstMessage()) 
+
+                return soapResult.IsSuccess.IsFalse()
+                    ? Result<HttpResponseMessage>.Failure(soapResult.GetFirstMessage())
                     : Result<HttpResponseMessage>.Success(soapResult.Response);
             }
             catch (Exception e)
