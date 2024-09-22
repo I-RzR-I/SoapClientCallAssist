@@ -50,7 +50,7 @@
 
   <ItemGroup>
     <PackageReference Include="AggregatedGenericResultMessage" Version="1.3.3.6068" />
-    <PackageReference Include="DomainCommonExtensions" Version="1.2.1" />
+    <PackageReference Include="DomainCommonExtensions" Version="1.3.0" />
     <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
   </ItemGroup>
 </Project>
