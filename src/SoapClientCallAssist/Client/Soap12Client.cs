@@ -155,7 +155,7 @@ namespace SoapClientCallAssist.Client
             catch (Exception e)
             {
                 return Result<HttpResponseMessage>
-                    .Failure(MessageCodesType.ER_S11_SR.GetDescription(), DefaultResultMessageHelper.ErrorMessages[MessageCodesType.ER_S11_SR])
+                    .Failure(MessageCodesType.ER_S12_SR.GetDescription(), DefaultResultMessageHelper.ErrorMessages[MessageCodesType.ER_S12_SR])
                     .WithError(e);
             }
         }
@@ -175,7 +175,7 @@ namespace SoapClientCallAssist.Client
             catch (Exception e)
             {
                 return Result<HttpResponseMessage>
-                    .Failure(MessageCodesType.ER_S11_SRA.GetDescription(), DefaultResultMessageHelper.ErrorMessages[MessageCodesType.ER_S11_SRA])
+                    .Failure(MessageCodesType.ER_S12_SRA.GetDescription(), DefaultResultMessageHelper.ErrorMessages[MessageCodesType.ER_S12_SRA])
                     .WithError(e);
             }
         }

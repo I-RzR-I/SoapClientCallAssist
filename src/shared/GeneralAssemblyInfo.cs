@@ -29,7 +29,7 @@ using System.Resources;
 
 [assembly: AssemblyCompany("RzR ®")]
 [assembly: AssemblyProduct("SoapClientCallAssist")]
-[assembly: AssemblyCopyright("Copyright © 2022-2024 RzR All rights reserved.")]
+[assembly: AssemblyCopyright("Copyright © 2022-2025 RzR All rights reserved.")]
 [assembly: AssemblyTrademark("® RzR™")]
 [assembly: AssemblyDescription("Provides a more easy way to implement and invoke SOAP(1.1, 1.2) service(`WCF`, `ASMX`) endpoints avoiding dependency on the `WSDL` definition and build requests with minimum required info (basic definition: `Action`, `XML`, `HTTP method`, etc).")]
 
@@ -38,6 +38,6 @@ using System.Resources;
 [assembly: AssemblyMetadata("ContactName", "RzR")]
 [assembly: AssemblyMetadata("ContactEmail", "ddpRzR@hotmail.com")]
 [assembly: NeutralResourcesLanguage("en-US", UltimateResourceFallbackLocation.MainAssembly)]
-[assembly: AssemblyVersion("1.0.4.5737")]
-[assembly: AssemblyFileVersion("1.0.4.5737")]
-[assembly: AssemblyInformationalVersion("1.0.4.5737")]
+[assembly: AssemblyVersion("1.0.5.7407")]
+[assembly: AssemblyFileVersion("1.0.5.7407")]
+[assembly: AssemblyInformationalVersion("1.0.5.7407")]
