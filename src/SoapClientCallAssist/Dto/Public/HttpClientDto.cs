@@ -16,7 +16,7 @@
 
 #region U S A G E S
 
-using DomainCommonExtensions.CommonExtensions.TypeParam;
+using RzR.Extensions.Domain.Reflection.TypeParam;
 using System;
 using System.Collections.Generic;
 using System.Text;

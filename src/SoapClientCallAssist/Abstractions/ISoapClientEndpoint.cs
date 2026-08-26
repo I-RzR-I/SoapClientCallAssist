@@ -16,7 +16,7 @@
 
 #region U S A G E S
 
-using AggregatedGenericResultMessage.Abstractions;
+using RzR.ResultMessage.Abstractions;
 using SoapClientCallAssist.Dto.Public;
 using System;
 using System.Collections.Generic;
