@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "SoapTestService": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:12956;http://localhost:12957"
+    }
+  }
+}
