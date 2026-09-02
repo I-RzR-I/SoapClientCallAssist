@@ -27,7 +27,7 @@ public sealed class TransportFailureTests
     private const string InvalidSoapMessage = "Invalid SOAP Message in response.";
 
     [TestMethod]
-    public async Task SendRequest_WhenTheServiceAnswersWith500_ReportsSuccessAndLeavesTheStatusUnchecked()
+    public async Task SendRequest_WhenTheServiceAnswersWith500_ReportsSuccessAndLeavesTheStatusUnchecked_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
         using var request = NegativeTestSupport.PostRequest(client, "NotFound500");
@@ -56,7 +56,7 @@ public sealed class TransportFailureTests
 
     [TestMethod]
     [Ignore("DEFECT-STATUS-IGNORED: unpins when fixed")]
-    public void SendRequest_WhenTheServiceAnswersWith500_ShouldReportFailure()
+    public void SendRequest_WhenTheServiceAnswersWith500_ShouldReportFailure_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
         using var request = NegativeTestSupport.PostRequest(client, "NotFound500");
@@ -67,7 +67,7 @@ public sealed class TransportFailureTests
     }
 
     [TestMethod]
-    public void SendRequest_WhenTheServiceOutlastsTheTimeout_FailsWithoutThrowing()
+    public void SendRequest_WhenTheServiceOutlastsTheTimeout_FailsWithoutThrowing_Test()
     {
         var client = SoapClientFactoryHelper.CreateDirectSoap12Client();
 
@@ -98,7 +98,7 @@ public sealed class TransportFailureTests
     }
 
     [TestMethod]
-    public async Task SendRequestAsync_WithAnAlreadyCancelledToken_FailsWithoutThrowing()
+    public async Task SendRequestAsync_WithAnAlreadyCancelledToken_FailsWithoutThrowing_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
         using var request = NegativeTestSupport.PostRequest(client, "HelloWorld");
@@ -121,7 +121,7 @@ public sealed class TransportFailureTests
     }
 
     [TestMethod]
-    public void GetXmlNodeResponseBody_WithMalformedXml_FailsGracefully()
+    public void GetXmlNodeResponseBody_WithMalformedXml_FailsGracefully_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
 

@@ -13,7 +13,7 @@ public sealed class Soap12EnvelopeConstructionTests
 {
 
     [TestMethod]
-    public void BuildRequest_PostWithNoArguments_ProducesASoap12Envelope()
+    public void BuildRequest_PostWithNoArguments_ProducesASoap12Envelope_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
 
@@ -33,7 +33,7 @@ public sealed class Soap12EnvelopeConstructionTests
     }
 
     [TestMethod]
-    public void BuildRequest_PostWithScalarArguments_PlacesThemAsChildrenOfTheOperationElement()
+    public void BuildRequest_PostWithScalarArguments_PlacesThemAsChildrenOfTheOperationElement_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
 
@@ -60,7 +60,7 @@ public sealed class Soap12EnvelopeConstructionTests
     }
 
     [TestMethod]
-    public void BuildRequest_PostWithNestedGraph_KeepsTheGraphAtDepthInTheEnvelope()
+    public void BuildRequest_PostWithNestedGraph_KeepsTheGraphAtDepthInTheEnvelope_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
 
@@ -88,7 +88,7 @@ public sealed class Soap12EnvelopeConstructionTests
     }
 
     [TestMethod]
-    public void BuildRequest_WithAction_PutsActionOnContentHeadersAndInTheContentType()
+    public void BuildRequest_WithAction_PutsActionOnContentHeadersAndInTheContentType_Test()
     {
         const string action = SoapAssert.ServiceNs + "EchoValue";
         var client = SoapClientFactoryHelper.CreateSoap12Client();
@@ -141,7 +141,7 @@ public sealed class Soap12EnvelopeConstructionTests
     }
 
     [TestMethod]
-    public void BuildRequest_WithoutAction_OmitsEveryActionMarker()
+    public void BuildRequest_WithoutAction_OmitsEveryActionMarker_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
 
@@ -175,7 +175,7 @@ public sealed class Soap12EnvelopeConstructionTests
     }
 
     [TestMethod]
-    public void BuildRequest_BothOverloads_ProduceEquivalentRequests()
+    public void BuildRequest_BothOverloads_ProduceEquivalentRequests_Test()
     {
         const string action = SoapAssert.ServiceNs + "AddRecordWithDetail";
         var client = SoapClientFactoryHelper.CreateSoap12Client();
@@ -228,7 +228,7 @@ public sealed class Soap12EnvelopeConstructionTests
 
     [TestMethod]
     [Ignore("DEFECT-SOAP12-ACTION-PARAM-NAME: unpins when fixed")]
-    public void BuildRequest_WithAction_ShouldNameTheContentTypeParameterAction()
+    public void BuildRequest_WithAction_ShouldNameTheContentTypeParameterAction_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
         const string action = "http://SoapClientCallAssist.local/EchoValue";
@@ -253,7 +253,7 @@ public sealed class Soap12EnvelopeConstructionTests
     }
 
     [TestMethod]
-    public void BuildRequest_WithUnqualifiedDirectChildThatHasChildren_FlattensItToConcatenatedText()
+    public void BuildRequest_WithUnqualifiedDirectChildThatHasChildren_FlattensItToConcatenatedText_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
         var ns = Soap12FunctionalSupport.Service;
@@ -292,7 +292,7 @@ public sealed class Soap12EnvelopeConstructionTests
 
     [TestMethod]
     [Ignore("DEFECT-BUILD-NEW-BODY-FLATTENS: unpins when fixed")]
-    public void BuildRequest_WithUnqualifiedDirectChildThatHasChildren_ShouldPreserveTheNestedStructure()
+    public void BuildRequest_WithUnqualifiedDirectChildThatHasChildren_ShouldPreserveTheNestedStructure_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
         var ns = Soap12FunctionalSupport.Service;

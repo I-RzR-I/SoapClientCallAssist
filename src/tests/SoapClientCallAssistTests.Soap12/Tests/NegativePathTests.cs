@@ -24,7 +24,7 @@ public sealed class NegativePathTests
     private const string Soap12BuildErrorMessage = "An error occurred while trying to build a SOAP 1.2 request.";
 
     [TestMethod]
-    public void BuildRequest_WithDisallowedHttpMethod_FailsAndNamesTheMethod()
+    public void BuildRequest_WithDisallowedHttpMethod_FailsAndNamesTheMethod_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
 
@@ -48,7 +48,7 @@ public sealed class NegativePathTests
 
     [TestMethod]
     [Ignore("DEFECT-VALIDATION-CODE-LOST: unpins when fixed")]
-    public void BuildRequest_WithDisallowedHttpMethod_ShouldSurfaceTheValidationCode()
+    public void BuildRequest_WithDisallowedHttpMethod_ShouldSurfaceTheValidationCode_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
 
@@ -66,7 +66,7 @@ public sealed class NegativePathTests
     }
 
     [TestMethod]
-    public void BuildRequest_WithNullUri_FailsAndSaysTheUriIsMandatory()
+    public void BuildRequest_WithNullUri_FailsAndSaysTheUriIsMandatory_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
 
@@ -87,7 +87,7 @@ public sealed class NegativePathTests
     }
 
     [TestMethod]
-    public void BuildRequest_WithNullRequestDto_FailsWithAWrappedNullReferenceRatherThanValidation()
+    public void BuildRequest_WithNullRequestDto_FailsWithAWrappedNullReferenceRatherThanValidation_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
 
@@ -113,7 +113,7 @@ public sealed class NegativePathTests
 
     [TestMethod]
     [Ignore("DEFECT-NULL-DTO-NRE: unpins when fixed")]
-    public void BuildRequest_WithNullRequestDto_ShouldReportTheNullRequestValidationFailure()
+    public void BuildRequest_WithNullRequestDto_ShouldReportTheNullRequestValidationFailure_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
 
@@ -127,7 +127,7 @@ public sealed class NegativePathTests
     }
 
     [TestMethod]
-    public void BuildRequest_WithEmptyBodiesOnGet_FailsWithTheCatchAllBuildMessage()
+    public void BuildRequest_WithEmptyBodiesOnGet_FailsWithTheCatchAllBuildMessage_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
 
@@ -145,7 +145,7 @@ public sealed class NegativePathTests
     }
 
     [TestMethod]
-    public void BuildRequest_FailureMessage_IsTheSameForEmptyBodiesAndNullBodies()
+    public void BuildRequest_FailureMessage_IsTheSameForEmptyBodiesAndNullBodies_Test()
     {
         var emptyBodiesResult = SoapClientFactoryHelper.CreateSoap12Client()
             .BuildRequest(HttpMethod.Get, SoapServiceFixture.ServiceUri, Array.Empty<XElement>());
@@ -164,7 +164,7 @@ public sealed class NegativePathTests
 
     [TestMethod]
     [Ignore("DEFECT-BUILD-CAUSE-OPAQUE: unpins when fixed")]
-    public void BuildRequest_FailureMessage_ShouldDistinguishEmptyBodiesFromNullBodies()
+    public void BuildRequest_FailureMessage_ShouldDistinguishEmptyBodiesFromNullBodies_Test()
     {
         var emptyBodiesResult = SoapClientFactoryHelper.CreateSoap12Client()
             .BuildRequest(HttpMethod.Get, SoapServiceFixture.ServiceUri, Array.Empty<XElement>());

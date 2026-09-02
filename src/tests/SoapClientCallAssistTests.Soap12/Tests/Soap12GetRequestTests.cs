@@ -11,7 +11,7 @@ public sealed class Soap12GetRequestTests
 {
 
     [TestMethod]
-    public async Task BuildAndSendGet_QueryForm_AddressesTheOperationAndEchoesBothArguments()
+    public async Task BuildAndSendGet_QueryForm_AddressesTheOperationAndEchoesBothArguments_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
         var correlationId = Soap12FunctionalSupport.NewCorrelationId();
@@ -42,7 +42,7 @@ public sealed class Soap12GetRequestTests
     }
 
     [TestMethod]
-    public async Task BuildAndSendGet_SlashForm_AppendsValuesAsPathSegmentsInOrder()
+    public async Task BuildAndSendGet_SlashForm_AppendsValuesAsPathSegmentsInOrder_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
         var correlationId = Soap12FunctionalSupport.NewCorrelationId();
@@ -73,7 +73,7 @@ public sealed class Soap12GetRequestTests
     }
 
     [TestMethod]
-    public void BuildGet_WithNamespacedBody_LeaksTheNamespaceIntoThePathSegment()
+    public void BuildGet_WithNamespacedBody_LeaksTheNamespaceIntoThePathSegment_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
         var correlationId = Soap12FunctionalSupport.NewCorrelationId();
@@ -104,7 +104,7 @@ public sealed class Soap12GetRequestTests
 
     [TestMethod]
     [Ignore("DEFECT-SOAP12-GET-QNAME: unpins when fixed")]
-    public void BuildGet_WithNamespacedBody_ShouldUseOnlyTheLocalNameInThePathSegment()
+    public void BuildGet_WithNamespacedBody_ShouldUseOnlyTheLocalNameInThePathSegment_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
         var correlationId = Soap12FunctionalSupport.NewCorrelationId();
@@ -123,7 +123,7 @@ public sealed class Soap12GetRequestTests
     }
 
     [TestMethod]
-    public async Task SendGet_StillShipsASoap12EnvelopeThatHasNoBodyElement()
+    public async Task SendGet_StillShipsASoap12EnvelopeThatHasNoBodyElement_Test()
     {
         const string action = SoapAssert.ServiceNs + "EchoValue";
 

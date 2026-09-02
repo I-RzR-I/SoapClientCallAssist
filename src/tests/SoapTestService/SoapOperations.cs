@@ -25,6 +25,12 @@ public static class SoapOperations
             case "GetProduct":
                 return GetProduct(operation, arguments);
 
+            case "IsValid":
+                return IsValid(operation, arguments);
+
+            case "AddRecordWithDetailWithLocations":
+                return AddRecordWithDetailWithLocations(operation, arguments);
+
             case "ThrowFault":
                 return ThrowFault();
 
@@ -122,6 +128,40 @@ public static class SoapOperations
         await Task.Delay(delay, cancellationToken);
 
         return Respond(operation, new XElement(SoapNames.Service + "SlowOpResult", delay));
+    }
+
+    private static SoapResult IsValid(string operation, SoapArguments arguments)
+    {
+        var id = arguments.GetString("id", 0);
+
+        return Respond(
+            operation,
+            new XElement(SoapNames.Service + "IsValidResult", string.IsNullOrEmpty(id) ? -1 : 1));
+    }
+
+    private static SoapResult AddRecordWithDetailWithLocations(string operation, SoapArguments arguments)
+    {
+        var product = arguments.GetElement("product");
+
+        if (product is null)
+            return SoapResult.Fault(SoapFaultCode.Sender, "Argument 'product' is required.");
+
+        var detail = SoapElement.Child(product, "Detail");
+
+        if (detail is null)
+            return SoapResult.Fault(SoapFaultCode.Sender, "Argument 'product.Detail' is required.");
+
+        var locations = arguments.GetElement("associatedLocationIds");
+        var locationIds = locations is null
+            ? Array.Empty<string>()
+            : locations.Elements().Select(element => element.Value).ToArray();
+
+        return Respond(
+            operation,
+            new XElement(SoapNames.Service + "AddRecordWithDetailWithLocationsResult", true),
+            new XElement(
+                SoapNames.Service + "ReceivedLocationIds",
+                locationIds.Select(id => new XElement(SoapNames.Service + "int", id))));
     }
 
     private static SoapResult Respond(string operation, params object[] content)

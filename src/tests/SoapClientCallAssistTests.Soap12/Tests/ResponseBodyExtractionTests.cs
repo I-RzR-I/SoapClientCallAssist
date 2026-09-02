@@ -14,7 +14,7 @@ public sealed class ResponseBodyExtractionTests
     private const string InvalidSoapMessage = "Invalid SOAP Message in response.";
 
     [TestMethod]
-    public void GetXmlNodeResponseBody_WithUnindentedEnvelope_ReturnsThePayloadElement()
+    public void GetXmlNodeResponseBody_WithUnindentedEnvelope_ReturnsThePayloadElement_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
 
@@ -28,7 +28,7 @@ public sealed class ResponseBodyExtractionTests
     }
 
     [TestMethod]
-    public void GetXmlNodeResponseBody_WithIndentedEnvelope_ReturnsAWhitespaceNodeInsteadOfThePayload()
+    public void GetXmlNodeResponseBody_WithIndentedEnvelope_ReturnsAWhitespaceNodeInsteadOfThePayload_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
 
@@ -58,7 +58,7 @@ public sealed class ResponseBodyExtractionTests
 
     [TestMethod]
     [Ignore("DEFECT-WS-FIRSTCHILD: unpins when fixed")]
-    public void GetXmlNodeResponseBody_WithIndentedEnvelope_ShouldReturnThePayloadElement()
+    public void GetXmlNodeResponseBody_WithIndentedEnvelope_ShouldReturnThePayloadElement_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
 
@@ -69,7 +69,7 @@ public sealed class ResponseBodyExtractionTests
     }
 
     [TestMethod]
-    public void GetXNodeResponseBody_WithIndentedEnvelope_RejectsAValidResponseAsInvalid()
+    public void GetXNodeResponseBody_WithIndentedEnvelope_RejectsAValidResponseAsInvalid_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
 
@@ -91,7 +91,7 @@ public sealed class ResponseBodyExtractionTests
     }
 
     [TestMethod]
-    public void GetXmlNodeResponseBody_WhenTheEnvelopeUsesAnotherPrefix_FailsAlthoughTheNamespaceIsCorrect()
+    public void GetXmlNodeResponseBody_WhenTheEnvelopeUsesAnotherPrefix_FailsAlthoughTheNamespaceIsCorrect_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
 
@@ -114,7 +114,7 @@ public sealed class ResponseBodyExtractionTests
 
     [TestMethod]
     [Ignore("DEFECT-PREFIX-BOUND-BODY-LOOKUP: unpins when fixed")]
-    public void GetXmlNodeResponseBody_WhenTheEnvelopeUsesAnotherPrefix_ShouldStillFindTheBody()
+    public void GetXmlNodeResponseBody_WhenTheEnvelopeUsesAnotherPrefix_ShouldStillFindTheBody_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
 
@@ -125,7 +125,7 @@ public sealed class ResponseBodyExtractionTests
     }
 
     [TestMethod]
-    public void GetXmlNodeResponseBody_WithSPrefixedEnvelope_FailsAlthoughAFallbackForItExists()
+    public void GetXmlNodeResponseBody_WithSPrefixedEnvelope_FailsAlthoughAFallbackForItExists_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
 
@@ -148,7 +148,7 @@ public sealed class ResponseBodyExtractionTests
 
     [TestMethod]
     [Ignore("DEFECT-S-BODY-FALLBACK-DEAD: unpins when fixed")]
-    public void GetXmlNodeResponseBody_WithSPrefixedEnvelope_ShouldUseTheFallback()
+    public void GetXmlNodeResponseBody_WithSPrefixedEnvelope_ShouldUseTheFallback_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
 

@@ -53,6 +53,23 @@ public static class SoapAssert
             $"The envelope is in the SOAP 1.1 namespace but SOAP 1.2 was expected. Document was: {Snippet(xml)}");
     }
 
+    public static XElement AssertIsSoap11Envelope(string xml)
+    {
+        var root = ParseRoot(xml);
+
+        Assert.AreEqual(
+            "Envelope",
+            root.Name.LocalName,
+            $"Expected the root element to be Envelope. Document was: {Snippet(xml)}");
+
+        Assert.AreEqual(
+            Soap11Ns,
+            root.Name.NamespaceName,
+            $"Expected the SOAP 1.1 envelope namespace. SOAP 1.2 uses {Soap12Ns}. Document was: {Snippet(xml)}");
+
+        return root;
+    }
+
     public static XElement GetBodyChild(string xml)
     {
         var root = AssertIsSoap12Envelope(xml);
@@ -63,6 +80,31 @@ public static class SoapAssert
         return body.Elements().FirstOrDefault()
                ?? throw Failed($"The SOAP body is empty. Document was: {Snippet(xml)}");
     }
+
+    public static XElement GetBodyChild(string xml, string envelopeNamespace)
+    {
+        var root = ParseRoot(xml);
+
+        Assert.AreEqual(
+            "Envelope",
+            root.Name.LocalName,
+            $"Expected the root element to be Envelope. Document was: {Snippet(xml)}");
+
+        Assert.AreEqual(
+            envelopeNamespace,
+            root.Name.NamespaceName,
+            $"Expected the {envelopeNamespace} envelope namespace. Document was: {Snippet(xml)}");
+
+        XNamespace ns = envelopeNamespace;
+
+        var body = root.Element(ns + "Body")
+                   ?? throw Failed($"The envelope has no SOAP Body element in namespace {envelopeNamespace}. Document was: {Snippet(xml)}");
+
+        return body.Elements().FirstOrDefault()
+               ?? throw Failed($"The SOAP body is empty. Document was: {Snippet(xml)}");
+    }
+
+    public static XElement GetSoap11BodyChild(string xml) => GetBodyChild(xml, Soap11Ns);
 
     public static void AssertElementValue(XElement scope, string localName, string expected)
     {
@@ -94,6 +136,20 @@ public static class SoapAssert
             Soap12MediaType,
             contentType.MediaType,
             $"Expected the SOAP 1.2 media type; SOAP 1.1 would produce {Soap11MediaType}. " +
+            $"The full header was: {contentType}");
+    }
+
+    public static void AssertContentTypeIsSoap11(HttpRequestMessage request)
+    {
+        ArgumentNullException.ThrowIfNull(request);
+
+        var contentType = request.Content?.Headers.ContentType
+                          ?? throw Failed("The request carries no Content-Type header, so it cannot be a SOAP 1.1 request.");
+
+        Assert.AreEqual(
+            Soap11MediaType,
+            contentType.MediaType,
+            $"Expected the SOAP 1.1 media type; SOAP 1.2 would produce {Soap12MediaType}. " +
             $"The full header was: {contentType}");
     }
 

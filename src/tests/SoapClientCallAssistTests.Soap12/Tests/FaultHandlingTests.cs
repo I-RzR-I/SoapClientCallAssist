@@ -14,7 +14,7 @@ public sealed class FaultHandlingTests
     private static readonly XNamespace Soap11Namespace = SoapAssert.Soap11Ns;
 
     [TestMethod]
-    public async Task CheckBodyForFaultCode_WithPopulatedFault_FailsAndSurfacesTheReason()
+    public async Task CheckBodyForFaultCode_WithPopulatedFault_FailsAndSurfacesTheReason_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
         using var request = NegativeTestSupport.PostRequest(client, "ThrowFault");
@@ -51,7 +51,7 @@ public sealed class FaultHandlingTests
 
     [TestMethod]
     [Ignore("DEFECT-FAULT-MESSAGE-CONCAT: unpins when fixed")]
-    public async Task CheckBodyForFaultCode_WithPopulatedFault_ShouldSurfaceOnlyTheReason()
+    public async Task CheckBodyForFaultCode_WithPopulatedFault_ShouldSurfaceOnlyTheReason_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
         using var request = NegativeTestSupport.PostRequest(client, "ThrowFault");
@@ -69,7 +69,7 @@ public sealed class FaultHandlingTests
     }
 
     [TestMethod]
-    public async Task CheckBodyForFaultCode_WithEmptyFaultReason_ReportsTheRawFaultCodeQNameAsTheMessage()
+    public async Task CheckBodyForFaultCode_WithEmptyFaultReason_ReportsTheRawFaultCodeQNameAsTheMessage_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
         using var request = NegativeTestSupport.PostRequest(client, "ThrowEmptyFault");
@@ -100,7 +100,7 @@ public sealed class FaultHandlingTests
 
     [TestMethod]
     [Ignore("DEFECT-FAULT-REASON-EMPTY: unpins when fixed")]
-    public async Task CheckBodyForFaultCode_WithEmptyFaultReason_ShouldNotSurfaceTheServerPrefixAsTheMessage()
+    public async Task CheckBodyForFaultCode_WithEmptyFaultReason_ShouldNotSurfaceTheServerPrefixAsTheMessage_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
         using var request = NegativeTestSupport.PostRequest(client, "ThrowEmptyFault");
@@ -118,7 +118,7 @@ public sealed class FaultHandlingTests
     }
 
     [TestMethod]
-    public void CheckBodyForFaultCode_WithFaultCarryingNoText_ReportsSuccessAlthoughAFaultIsPresent()
+    public void CheckBodyForFaultCode_WithFaultCarryingNoText_ReportsSuccessAlthoughAFaultIsPresent_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
 
@@ -136,7 +136,7 @@ public sealed class FaultHandlingTests
 
     [TestMethod]
     [Ignore("DEFECT-FAULT-DETECTION-BY-TEXT: unpins when fixed")]
-    public void CheckBodyForFaultCode_WithFaultCarryingNoText_ShouldReportFailure()
+    public void CheckBodyForFaultCode_WithFaultCarryingNoText_ShouldReportFailure_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
 
@@ -148,7 +148,7 @@ public sealed class FaultHandlingTests
     }
 
     [TestMethod]
-    public void CheckBodyForFaultCode_WithSoap11Fault_IsIgnoredBySoap12ButSeenBySoap11()
+    public void CheckBodyForFaultCode_WithSoap11Fault_IsIgnoredBySoap12ButSeenBySoap11_Test()
     {
 
         var soap11Fault = NegativeTestSupport.FindFault(NegativeTestSupport.Soap11FaultEnvelope, Soap11Namespace);
@@ -179,7 +179,7 @@ public sealed class FaultHandlingTests
     }
 
     [TestMethod]
-    public void CheckBodyForFaultCode_WithFaultFreeResponse_ReportsSuccess()
+    public void CheckBodyForFaultCode_WithFaultFreeResponse_ReportsSuccess_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
 

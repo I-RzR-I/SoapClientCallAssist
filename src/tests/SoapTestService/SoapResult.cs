@@ -6,7 +6,6 @@ namespace SoapTestService;
 
 public sealed class SoapResult : IResult
 {
-    private const string SoapContentType = "application/soap+xml; charset=utf-8";
     private const string NoSniff = "nosniff";
 
     private const int RenderBufferBytes = 1024;
@@ -51,38 +50,54 @@ public sealed class SoapResult : IResult
     {
         ArgumentNullException.ThrowIfNull(httpContext);
 
+        var isSoap11 = httpContext.Request.Path.StartsWithSegments(SoapEndpoints.ServiceAsmxPath);
+        var envelopeNamespace = isSoap11 ? SoapNames.Soap11 : SoapNames.Soap12;
+        var mediaType = isSoap11 ? SoapNames.Soap11MediaType : SoapNames.Soap12MediaType;
+
         var prefix = SoapPrefixSwitch.Resolve(httpContext.Request.Query[SoapPrefixSwitch.QueryKey].ToString());
 
-        var content = _fault is { } fault ? BuildFault(fault.Code, fault.Reason, prefix) : _payload;
+        var content = _fault is { } fault
+            ? BuildFault(fault.Code, fault.Reason, prefix, envelopeNamespace, isSoap11)
+            : _payload;
 
         var envelope = new XElement(
-            SoapNames.Soap12 + "Envelope",
-            new XAttribute(XNamespace.Xmlns + prefix, SoapNames.Soap12.NamespaceName),
-            new XElement(SoapNames.Soap12 + "Body", content));
+            envelopeNamespace + "Envelope",
+            new XAttribute(XNamespace.Xmlns + prefix, envelopeNamespace.NamespaceName),
+            new XElement(envelopeNamespace + "Body", content));
 
         var body = Serialize(envelope);
         var response = httpContext.Response;
 
         response.StatusCode = _statusCode;
-        response.ContentType = SoapContentType;
+        response.ContentType = $"{mediaType}; charset=utf-8";
         response.ContentLength = body.Length;
         response.Headers.XContentTypeOptions = NoSniff;
 
         await response.Body.WriteAsync(body, httpContext.RequestAborted);
     }
 
-    private static XElement BuildFault(SoapFaultCode code, string reason, string prefix)
-        => new(
-            SoapNames.Soap12 + "Fault",
-            new XElement(
-                SoapNames.Soap12 + "Code",
-                new XElement(SoapNames.Soap12 + "Value", $"{prefix}:{code}")),
-            new XElement(
-                SoapNames.Soap12 + "Reason",
+    private static XElement BuildFault(
+        SoapFaultCode code,
+        string reason,
+        string prefix,
+        XNamespace envelopeNamespace,
+        bool isSoap11)
+        => isSoap11
+            ? new XElement(
+                envelopeNamespace + "Fault",
+                new XElement("faultcode", $"{prefix}:{Soap11FaultCode(code)}"),
+                new XElement("faultstring", reason))
+            : new XElement(
+                envelopeNamespace + "Fault",
                 new XElement(
-                    SoapNames.Soap12 + "Text",
-                    new XAttribute(XNamespace.Xml + "lang", "en"),
-                    reason)));
+                    envelopeNamespace + "Code",
+                    new XElement(envelopeNamespace + "Value", $"{prefix}:{code}")),
+                new XElement(
+                    envelopeNamespace + "Reason",
+                    new XElement(
+                        envelopeNamespace + "Text",
+                        new XAttribute(XNamespace.Xml + "lang", "en"),
+                        reason)));
 
     private static byte[] Serialize(XElement envelope)
     {
@@ -93,4 +108,12 @@ public sealed class SoapResult : IResult
 
         return buffer.ToArray();
     }
+
+    private static string Soap11FaultCode(SoapFaultCode code)
+        => code switch
+        {
+            SoapFaultCode.Sender => "Client",
+            SoapFaultCode.Receiver => "Server",
+            _ => code.ToString()
+        };
 }

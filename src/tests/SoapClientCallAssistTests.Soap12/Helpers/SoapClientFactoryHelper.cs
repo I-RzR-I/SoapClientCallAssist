@@ -18,6 +18,8 @@ public static class SoapClientFactoryHelper
 
     public static ISoapClientEndpoint CreateDirectSoap12Client() => new Soap12Client();
 
+    public static ISoapClientEndpoint CreateDirectSoap11Client() => new Soap11Client();
+
     private static ISoapClientEndpoint CreateClient(SoapProtocolType protocol)
     {
         var services = new ServiceCollection();

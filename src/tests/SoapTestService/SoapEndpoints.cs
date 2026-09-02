@@ -9,26 +9,44 @@ public static class SoapEndpoints
 {
     public const string ServicePath = "/ServiceSvc.svc";
 
-    private const string SoapMediaType = "application/soap+xml";
+    public const string ServiceAsmxPath = "/ServiceAsmx.asmx";
 
     public static void MapSoapService(this IEndpointRouteBuilder endpoints)
     {
         ArgumentNullException.ThrowIfNull(endpoints);
 
-        endpoints.MapPost(ServicePath, HandlePostAsync);
+        endpoints.MapPost(
+            ServicePath,
+            (HttpContext context, RequestRecorder recorder)
+                => HandlePostAsync(context, recorder, SoapNames.Soap12MediaType, SoapNames.Soap12));
+        endpoints.MapGet(
+            $"{ServicePath}/{{**rest}}",
+            (HttpContext context, RequestRecorder recorder, string? rest)
+                => HandleGetAsync(context, recorder, rest, SoapNames.Soap12MediaType));
 
-        endpoints.MapGet($"{ServicePath}/{{**rest}}", HandleGetAsync);
+        endpoints.MapPost(
+            ServiceAsmxPath,
+            (HttpContext context, RequestRecorder recorder)
+                => HandlePostAsync(context, recorder, SoapNames.Soap11MediaType, SoapNames.Soap11));
+        endpoints.MapGet(
+            $"{ServiceAsmxPath}/{{**rest}}",
+            (HttpContext context, RequestRecorder recorder, string? rest)
+                => HandleGetAsync(context, recorder, rest, SoapNames.Soap11MediaType));
     }
 
-    private static async Task<IResult> HandlePostAsync(HttpContext context, RequestRecorder recorder)
+    private static async Task<IResult> HandlePostAsync(
+        HttpContext context,
+        RequestRecorder recorder,
+        string expectedMediaType,
+        XNamespace envelopeNamespace)
     {
         var body = await RecordAsync(context, recorder);
 
-        if (!IsSoapMediaType(context.Request.ContentType))
+        if (!IsSoapMediaType(context.Request.ContentType, expectedMediaType))
         {
             return SoapResult.Fault(
                 SoapFaultCode.Sender,
-                $"Content-Type must be {SoapMediaType}.",
+                $"Content-Type must be {expectedMediaType}.",
                 StatusCodes.Status415UnsupportedMediaType);
         }
 
@@ -36,7 +54,7 @@ public static class SoapEndpoints
 
         try
         {
-            envelopeBody = ReadEnvelopeBody(body);
+            envelopeBody = ReadEnvelopeBody(body, envelopeNamespace);
         }
         catch (XmlException)
         {
@@ -46,7 +64,7 @@ public static class SoapEndpoints
         var operationElement = envelopeBody?.Elements().FirstOrDefault();
 
         if (operationElement is null)
-            return SoapResult.Fault(SoapFaultCode.Sender, "The SOAP 1.2 envelope carries no body element.");
+            return SoapResult.Fault(SoapFaultCode.Sender, "The SOAP envelope carries no body element.");
 
         return await SoapOperations.InvokeAsync(
             operationElement.Name.LocalName,
@@ -54,9 +72,21 @@ public static class SoapEndpoints
             context.RequestAborted);
     }
 
-    private static async Task<IResult> HandleGetAsync(HttpContext context, RequestRecorder recorder, string? rest)
+    private static async Task<IResult> HandleGetAsync(
+        HttpContext context,
+        RequestRecorder recorder,
+        string? rest,
+        string expectedMediaType)
     {
         await RecordAsync(context, recorder);
+
+        if (!IsSoapMediaType(context.Request.ContentType, expectedMediaType))
+        {
+            return SoapResult.Fault(
+                SoapFaultCode.Sender,
+                $"Content-Type must be {expectedMediaType}.",
+                StatusCodes.Status415UnsupportedMediaType);
+        }
 
         var (operation, positional) = ParseRequestLine(rest);
 
@@ -122,19 +152,19 @@ public static class SoapEndpoints
         return body;
     }
 
-    private static XElement? ReadEnvelopeBody(string body)
+    private static XElement? ReadEnvelopeBody(string body, XNamespace envelopeNamespace)
     {
         using var textReader = new StringReader(body);
         using var xmlReader = SoapXml.CreateReader(textReader);
 
         var root = XDocument.Load(xmlReader).Root;
 
-        return root?.Name == SoapNames.Soap12 + "Envelope"
-            ? root.Element(SoapNames.Soap12 + "Body")
+        return root?.Name == envelopeNamespace + "Envelope"
+            ? root.Element(envelopeNamespace + "Body")
             : null;
     }
 
-    private static bool IsSoapMediaType(string? contentType)
+    private static bool IsSoapMediaType(string? contentType, string expectedMediaType)
         => MediaTypeHeaderValue.TryParse(contentType, out var parsed)
-           && string.Equals(parsed.MediaType.Value, SoapMediaType, StringComparison.OrdinalIgnoreCase);
+           && string.Equals(parsed.MediaType.Value, expectedMediaType, StringComparison.OrdinalIgnoreCase);
 }

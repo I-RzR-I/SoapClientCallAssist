@@ -28,7 +28,7 @@ public sealed class ProbeTests
     public TestContext TestContext { get; set; } = default!;
 
     [TestMethod]
-    public void ProbeA_GetUriForms()
+    public void ProbeA_GetUriForms_Test()
     {
         var client = ResolveSoap12Client();
 
@@ -39,7 +39,7 @@ public sealed class ProbeTests
     }
 
     [TestMethod]
-    public void ProbeB_FailureResultShape()
+    public void ProbeB_FailureResultShape_Test()
     {
         var client = ResolveSoap12Client();
 
@@ -57,7 +57,7 @@ public sealed class ProbeTests
     }
 
     [TestMethod]
-    public async Task ProbeC_NestedBodySurvival()
+    public async Task ProbeC_NestedBodySurvival_Test()
     {
         var client = ResolveSoap12Client();
 
@@ -85,7 +85,7 @@ public sealed class ProbeTests
     }
 
     [TestMethod]
-    public async Task ProbeD_Soap12Markers()
+    public async Task ProbeD_Soap12Markers_Test()
     {
         var client = ResolveSoap12Client();
         const string action = ProbeNamespace + "EchoValue";

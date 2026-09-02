@@ -17,17 +17,23 @@ public sealed class SoapServiceFixture
 
     private const string ServiceRelativePath = "ServiceSvc.svc";
 
+    private const string Service11RelativePath = "ServiceAsmx.asmx";
+
     private static WebApplication? _app;
 
     private static Uri? _baseAddress;
 
     private static Uri? _serviceUri;
 
+    private static Uri? _service11Uri;
+
     private static RequestRecorder? _recorder;
 
     public static Uri BaseAddress => Required(_baseAddress, nameof(BaseAddress));
 
     public static Uri ServiceUri => Required(_serviceUri, nameof(ServiceUri));
+
+    public static Uri Service11Uri => Required(_service11Uri, nameof(Service11Uri));
 
     public static RequestRecorder Recorder => Required(_recorder, nameof(Recorder));
 
@@ -45,9 +51,11 @@ public sealed class SoapServiceFixture
 
             _baseAddress = baseAddress;
             _serviceUri = new Uri(baseAddress, ServiceRelativePath);
+            _service11Uri = new Uri(baseAddress, Service11RelativePath);
             _recorder = app.Services.GetRequiredService<RequestRecorder>();
 
-            testContext.WriteLine($"SOAP test service listening on {baseAddress}, endpoint {_serviceUri}");
+            testContext.WriteLine(
+                $"SOAP test service listening on {baseAddress}, endpoints {_serviceUri} and {_service11Uri}");
         }
         catch
         {
@@ -70,6 +78,7 @@ public sealed class SoapServiceFixture
         _app = null;
         _baseAddress = null;
         _serviceUri = null;
+        _service11Uri = null;
         _recorder = null;
 
         try

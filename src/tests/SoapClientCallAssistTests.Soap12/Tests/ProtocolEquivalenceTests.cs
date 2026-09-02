@@ -13,7 +13,7 @@ public sealed class ProtocolEquivalenceTests
 {
 
     [TestMethod]
-    public void DisallowedHttpMethod_IsReportedIdenticallyByBothProtocolClients()
+    public void DisallowedHttpMethod_IsReportedIdenticallyByBothProtocolClients_Test()
     {
         var soap12Result = SoapClientFactoryHelper.CreateSoap12Client()
             .BuildRequest(HttpMethod.Put, SoapServiceFixture.ServiceUri, NegativeTestSupport.Bodies("EchoValue", ("value", "abc")));
@@ -25,7 +25,7 @@ public sealed class ProtocolEquivalenceTests
     }
 
     [TestMethod]
-    public void MissingUri_IsReportedIdenticallyByBothProtocolClients()
+    public void MissingUri_IsReportedIdenticallyByBothProtocolClients_Test()
     {
         var soap12Result = SoapClientFactoryHelper.CreateSoap12Client()
             .BuildRequest(HttpMethod.Post, null, NegativeTestSupport.Bodies("EchoValue", ("value", "abc")));
@@ -37,7 +37,7 @@ public sealed class ProtocolEquivalenceTests
     }
 
     [TestMethod]
-    public void EmptyBodiesOnGet_IsReportedIdenticallyByBothProtocolClients()
+    public void EmptyBodiesOnGet_IsReportedIdenticallyByBothProtocolClients_Test()
     {
         var soap12Result = SoapClientFactoryHelper.CreateSoap12Client()
             .BuildRequest(HttpMethod.Get, SoapServiceFixture.ServiceUri, Array.Empty<XElement>());
@@ -52,7 +52,7 @@ public sealed class ProtocolEquivalenceTests
     }
 
     [TestMethod]
-    public void NullRequestDto_IsReportedWithAProtocolSpecificCode()
+    public void NullRequestDto_IsReportedWithAProtocolSpecificCode_Test()
     {
         var soap12Result = SoapClientFactoryHelper.CreateSoap12Client()
             .BuildRequest(HttpMethod.Post, null!);

@@ -13,7 +13,7 @@ public sealed class SoapServiceFixtureTests
     private static readonly TimeSpan RequestTimeout = TimeSpan.FromSeconds(10);
 
     [TestMethod]
-    public void BaseAddress_IsLoopbackOnAnAssignedPort()
+    public void BaseAddress_IsLoopbackOnAnAssignedPort_Test()
     {
         var baseAddress = SoapServiceFixture.BaseAddress;
 
@@ -23,7 +23,7 @@ public sealed class SoapServiceFixtureTests
     }
 
     [TestMethod]
-    public void ServiceUri_IsTheServicePathUnderTheBaseAddress()
+    public void ServiceUri_IsTheServicePathUnderTheBaseAddress_Test()
     {
         Assert.AreEqual(
             SoapServiceFixture.BaseAddress.Port,
@@ -34,11 +34,11 @@ public sealed class SoapServiceFixtureTests
     }
 
     [TestMethod]
-    public void Recorder_IsResolvedFromTheRunningService()
+    public void Recorder_IsResolvedFromTheRunningService_Test()
         => Assert.IsNotNull(SoapServiceFixture.Recorder, "The fixture published no request recorder.");
 
     [TestMethod]
-    public async Task Health_RespondsOk()
+    public async Task Health_RespondsOk_Test()
     {
         using var client = new HttpClient { Timeout = RequestTimeout };
 

@@ -15,7 +15,7 @@ public sealed class Soap12HappyPathTests
     private static readonly TimeSpan CallTimeout = TimeSpan.FromSeconds(30);
 
     [TestMethod]
-    public async Task SendRequest_HelloWorld_ReturnsTheGreetingInASoap12Envelope()
+    public async Task SendRequest_HelloWorld_ReturnsTheGreetingInASoap12Envelope_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
         var correlationId = Soap12FunctionalSupport.NewCorrelationId();
@@ -41,7 +41,7 @@ public sealed class Soap12HappyPathTests
     }
 
     [TestMethod]
-    public async Task SendRequestAsync_HelloWorld_ReturnsTheGreetingInASoap12Envelope()
+    public async Task SendRequestAsync_HelloWorld_ReturnsTheGreetingInASoap12Envelope_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
         var correlationId = Soap12FunctionalSupport.NewCorrelationId();
@@ -69,7 +69,7 @@ public sealed class Soap12HappyPathTests
     }
 
     [TestMethod]
-    public async Task SendRequest_EchoValue_ReturnsBothArgumentsJoined()
+    public async Task SendRequest_EchoValue_ReturnsBothArgumentsJoined_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
         var correlationId = Soap12FunctionalSupport.NewCorrelationId();
@@ -90,7 +90,7 @@ public sealed class Soap12HappyPathTests
     }
 
     [TestMethod]
-    public async Task SendRequestAsync_EchoValue_ReturnsBothArgumentsJoined()
+    public async Task SendRequestAsync_EchoValue_ReturnsBothArgumentsJoined_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
         var correlationId = Soap12FunctionalSupport.NewCorrelationId();
@@ -113,7 +113,7 @@ public sealed class Soap12HappyPathTests
     }
 
     [TestMethod]
-    public async Task SendRequest_AddRecordWithDetail_RoundTripsTheNestedGraphAtDepth()
+    public async Task SendRequest_AddRecordWithDetail_RoundTripsTheNestedGraphAtDepth_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
         var correlationId = Soap12FunctionalSupport.NewCorrelationId();
@@ -153,7 +153,7 @@ public sealed class Soap12HappyPathTests
     }
 
     [TestMethod]
-    public async Task SendRequestAsync_GetProduct_ExtractedBodyCarriesTheNestedDetail()
+    public async Task SendRequestAsync_GetProduct_ExtractedBodyCarriesTheNestedDetail_Test()
     {
         const int productId = 42;
 
@@ -205,7 +205,7 @@ public sealed class Soap12HappyPathTests
     }
 
     [TestMethod]
-    public async Task SendRequestAsync_WithLiveCancellationToken_CompletesAndReturnsThePayload()
+    public async Task SendRequestAsync_WithLiveCancellationToken_CompletesAndReturnsThePayload_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
         var correlationId = Soap12FunctionalSupport.NewCorrelationId();

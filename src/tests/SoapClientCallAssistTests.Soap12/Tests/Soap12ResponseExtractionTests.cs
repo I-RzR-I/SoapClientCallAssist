@@ -18,7 +18,7 @@ public sealed class Soap12ResponseExtractionTests
     private const string NoSingleBodyMessage = "No or more than one SOAP Body in response.";
 
     [TestMethod]
-    public async Task GetXmlNodeResponseBody_WithDefaultArguments_ExtractsTheOperationResponseElement()
+    public async Task GetXmlNodeResponseBody_WithDefaultArguments_ExtractsTheOperationResponseElement_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
 
@@ -38,7 +38,7 @@ public sealed class Soap12ResponseExtractionTests
     }
 
     [TestMethod]
-    public async Task GetXmlNodeResponseBody_WhenTheResponseUsesTheSPrefix_FailsAlthoughTheEnvelopeIsValid()
+    public async Task GetXmlNodeResponseBody_WhenTheResponseUsesTheSPrefix_FailsAlthoughTheEnvelopeIsValid_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
 
@@ -66,7 +66,7 @@ public sealed class Soap12ResponseExtractionTests
 
     [TestMethod]
     [Ignore("DEFECT-SOAP12-BODY-PREFIX: unpins when fixed")]
-    public async Task GetXmlNodeResponseBody_WhenTheResponseUsesTheSPrefix_ShouldStillExtractTheBodyChild()
+    public async Task GetXmlNodeResponseBody_WhenTheResponseUsesTheSPrefix_ShouldStillExtractTheBodyChild_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
 
@@ -86,7 +86,7 @@ public sealed class Soap12ResponseExtractionTests
     }
 
     [TestMethod]
-    public async Task GetXNodeResponseBody_WithDefaultArguments_ExtractsTheOperationResponseElement()
+    public async Task GetXNodeResponseBody_WithDefaultArguments_ExtractsTheOperationResponseElement_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
 
@@ -110,7 +110,7 @@ public sealed class Soap12ResponseExtractionTests
     }
 
     [TestMethod]
-    public async Task GetXNodeResponseBody_WhenTheResponseUsesTheSPrefix_FailsAlthoughTheEnvelopeIsValid()
+    public async Task GetXNodeResponseBody_WhenTheResponseUsesTheSPrefix_FailsAlthoughTheEnvelopeIsValid_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
 
@@ -129,7 +129,7 @@ public sealed class Soap12ResponseExtractionTests
 
     [TestMethod]
     [Ignore("DEFECT-SOAP12-BODY-PREFIX: unpins when fixed")]
-    public async Task GetXNodeResponseBody_WhenTheResponseUsesTheSPrefix_ShouldStillExtractTheBodyChild()
+    public async Task GetXNodeResponseBody_WhenTheResponseUsesTheSPrefix_ShouldStillExtractTheBodyChild_Test()
     {
         var client = SoapClientFactoryHelper.CreateSoap12Client();
 
@@ -159,7 +159,7 @@ public sealed class Soap12ResponseExtractionTests
         SoapAssert.Soap11MediaType,
         SoapAssert.Soap11Ns,
         DisplayName = "SOAP 1.1 sends text/xml and the xmlsoap.org envelope namespace")]
-    public void BuildRequest_MediaTypeAndEnvelopeNamespace_AreTheOnesTheProtocolMandates(
+    public void BuildRequest_MediaTypeAndEnvelopeNamespace_AreTheOnesTheProtocolMandates_Test(
         SoapProtocolType protocol,
         string expectedMediaType,
         string expectedEnvelopeNamespace)
