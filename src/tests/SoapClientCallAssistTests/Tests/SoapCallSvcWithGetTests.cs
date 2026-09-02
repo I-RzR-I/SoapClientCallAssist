@@ -4,7 +4,7 @@
 //  Created On       : 2024-09-16 19:44
 // 
 //  Last Modified By : RzR
-//  Last Modified On : 2024-09-16 19:44
+//  Last Modified On : 2026-09-02 23:27
 // ***********************************************************************
 //  <copyright file="SoapCallSvcWithGetTests.cs" company="">
 //   Copyright (c) RzR. All rights reserved.
@@ -26,7 +26,7 @@ using System.Net;
 using System.Net.Http;
 using System.Xml.Linq;
 
-namespace SoapClientCallAssistTests
+namespace SoapClientCallAssistTests.Tests
 {
     [TestClass]
     public class SoapCallSvcWithGetTests
@@ -45,7 +45,7 @@ namespace SoapClientCallAssistTests
         }
 
         //[TestMethod]
-        public void CallIsValidInHttpGetWithNameInBodies()
+        public void CallIsValidInHttpGetWithNameInBodies_Test()
         {
             var client = _clientFactory(SoapProtocolType.SOAP_1_1);
             var ns = XNamespace.Get("http://SoapClientCallAssist.local/");

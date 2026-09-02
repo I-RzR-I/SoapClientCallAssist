@@ -4,7 +4,7 @@
 //  Created On       : 2024-09-13 14:07
 // 
 //  Last Modified By : RzR
-//  Last Modified On : 2024-09-13 14:07
+//  Last Modified On : 2026-09-02 23:27
 // ***********************************************************************
 //  <copyright file="SoapCallAsmxTests.cs" company="">
 //   Copyright (c) RzR. All rights reserved.
@@ -27,7 +27,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 
-namespace SoapClientCallAssistTests
+namespace SoapClientCallAssistTests.Tests
 {
     [TestClass]
     public class SoapCallAsmxWithGetTests
@@ -46,7 +46,7 @@ namespace SoapClientCallAssistTests
         }
 
         [TestMethod]
-        public void CallIsValidInHttpGetWithNameInBodies()
+        public void CallIsValidInHttpGetWithNameInBodies_Test()
         {
             var client = _clientFactory(SoapProtocolType.SOAP_1_1);
             var ns = XNamespace.Get("http://SoapClientCallAssist.local/");
@@ -79,7 +79,7 @@ namespace SoapClientCallAssistTests
         }
 
         [TestMethod]
-        public void CallIsValidInHttpGetWithNameInBodies_v2()
+        public void CallIsValidInHttpGetWithNameInBodies_v2_Test()
         {
             var client = _clientFactory(SoapProtocolType.SOAP_1_1);
             var ns = XNamespace.Get("http://SoapClientCallAssist.local/");
@@ -114,7 +114,7 @@ namespace SoapClientCallAssistTests
         }
 
         [TestMethod]
-        public async Task CallIsValidInHttpGetWithNameInBodiesAsync()
+        public async Task CallIsValidInHttpGetWithNameInBodiesAsync_Test()
         {
             var client = _clientFactory(SoapProtocolType.SOAP_1_1);
             var ns = XNamespace.Get("http://SoapClientCallAssist.local/");
@@ -147,7 +147,7 @@ namespace SoapClientCallAssistTests
         }
 
         [TestMethod]
-        public void CallIsValidInHttpGetWithNameInBodiesAndIdWithNs()
+        public void CallIsValidInHttpGetWithNameInBodiesAndIdWithNs_Test()
         {
             var client = _clientFactory(SoapProtocolType.SOAP_1_1);
             var ns = XNamespace.Get("http://SoapClientCallAssist.local/");
@@ -181,7 +181,7 @@ namespace SoapClientCallAssistTests
         }
 
         [TestMethod]
-        public async Task CallIsValidInHttpGetWithNameInBodiesAndIdWithNsAsync()
+        public async Task CallIsValidInHttpGetWithNameInBodiesAndIdWithNsAsync_Test()
         {
             var client = _clientFactory(SoapProtocolType.SOAP_1_1);
             var ns = XNamespace.Get("http://SoapClientCallAssist.local/");
