@@ -1,20 +1,21 @@
 ﻿// ***********************************************************************
-//  Assembly         : RzR.Shared.Services.SoapClientCallAssist
-//  Author           : RzR
-//  Created On       : 2024-09-12 19:05
+//  Assembly          : RzR.Shared.Services.SoapClientCallAssist
+//  Author            : RzR
+//  Created On        : 2024-09-12 19:05
 // 
 //  Last Modified By : RzR
-//  Last Modified On : 2024-09-15 19:25
-// ***********************************************************************
-//  <copyright file="Soap12Client.cs" company="">
-//   Copyright (c) RzR. All rights reserved.
+//  Last Modified On : 2026-08-31 20:42
+//  ***********************************************************************
+//  <copyright file="Soap12Client.cs" company="RzR SOFT & TECH">
+//      Copyright (c) RzR. All rights reserved.
 //  </copyright>
-// 
-//  <summary>
-//  </summary>
-// ***********************************************************************
+//  <contact>
+//      https://iamrzr.dev/contact
+//  </contact>
+//  <summary></summary>
+//  ***********************************************************************
 
-#region U S A G E S
+#region U S I N G
 
 using RzR.Extensions.Domain.Primitives;
 using RzR.ResultMessage;
@@ -37,20 +38,18 @@ using System.Xml.Linq;
 
 namespace SoapClientCallAssist.Client
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     SOAP 1.2 client.
     /// </summary>
     /// <seealso cref="T:SoapClientCallAssist.Client.BaseEndpointClient"/>
-    /// <seealso cref="T:SoapClientCallAssist.Abstractions.ISoapClientEndpoint"/>
-    /// =================================================================================================
+    /// <seealso cref="T:SoapClientCallAssist.Abstractions.ISoapClientEndpoint">
+    ///     =================================================================================================
+    /// </seealso>
     public sealed class Soap12Client : BaseEndpointClient, ISoapClientEndpoint
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     The client time out.
         /// </summary>
-        /// =================================================================================================
         private TimeSpan _clientTimeOut = TimeSpan.FromMinutes(2);
 
         /// <inheritdoc/>
@@ -76,24 +75,24 @@ namespace SoapClientCallAssist.Client
                 var requestMessage = BuildRequest(
                     method,
                     new BuildSoapRequestDto(
-                        new HttpClientDto()
+                        new HttpClientDto
                         {
                             BodyEncoding = bodyEncoding,
                             BuildGetRequestAsSlashUrl = buildGetRequestAsSlashUrl,
                             Endpoint = endpoint,
                             HttpClientHeaders = httpClientHeaders
                         },
-                        new SoapEnvelopeDto()
+                        new SoapEnvelopeDto
                         {
                             Bodies = bodies,
-                            Headers = headers,
+                            Headers = headers, 
                             OwnSoapEnvelopeAttributes = ownSoapEnvelopeAttributes,
                             Action = action
                         }
                     ));
 
-                return requestMessage.IsSuccess.IsFalse() 
-                    ? Result<HttpRequestMessage>.Failure(requestMessage.GetFirstMessage()) 
+                return requestMessage.IsSuccess.IsFalse()
+                    ? Result<HttpRequestMessage>.Failure(requestMessage.GetFirstMessage())
                     : Result<HttpRequestMessage>.Success(requestMessage.Response);
             }
             catch (Exception e)
@@ -140,7 +139,7 @@ namespace SoapClientCallAssist.Client
             }
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public IResult<HttpResponseMessage> SendRequest(HttpRequestMessage request)
         {
             try
@@ -148,7 +147,7 @@ namespace SoapClientCallAssist.Client
                 var soapResult = base.SendRequest(request, _clientTimeOut);
 
                 return soapResult.IsSuccess.IsFalse()
-                    ? Result<HttpResponseMessage>.Failure(soapResult.GetFirstMessage()) 
+                    ? Result<HttpResponseMessage>.Failure(soapResult.GetFirstMessage())
                     : Result<HttpResponseMessage>.Success(soapResult.Response);
             }
             catch (Exception e)
@@ -159,16 +158,17 @@ namespace SoapClientCallAssist.Client
             }
         }
 
-        /// <inheritdoc />
-        public async Task<IResult<HttpResponseMessage>> SendRequestAsync(HttpRequestMessage request,
+        /// <inheritdoc/>
+        public async Task<IResult<HttpResponseMessage>> SendRequestAsync(
+            HttpRequestMessage request,
             CancellationToken cancellationToken = default)
         {
             try
             {
                 var soapResult = await base.SendRequestAsync(request, _clientTimeOut, cancellationToken);
-                
-                return soapResult.IsSuccess.IsFalse() 
-                    ? Result<HttpResponseMessage>.Failure(soapResult.GetFirstMessage()) 
+
+                return soapResult.IsSuccess.IsFalse()
+                    ? Result<HttpResponseMessage>.Failure(soapResult.GetFirstMessage())
                     : Result<HttpResponseMessage>.Success(soapResult.Response);
             }
             catch (Exception e)
@@ -178,7 +178,8 @@ namespace SoapClientCallAssist.Client
                     .WithError(e);
             }
         }
-        /// <inheritdoc />
+
+        /// <inheritdoc/>
         public IResult SetClientTimeout(TimeSpan clientTimeout)
         {
             if (clientTimeout.IsNotNull())
@@ -187,7 +188,7 @@ namespace SoapClientCallAssist.Client
             return Result.Success();
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public IResult CheckBodyForFaultCode(string soapResponse)
             => base.CheckBodyForFaultCode(soapResponse, SoapNamespaceType.Soap12.GetDescription());
     }

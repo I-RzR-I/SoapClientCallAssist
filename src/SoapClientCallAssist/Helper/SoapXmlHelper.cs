@@ -1,20 +1,21 @@
 ﻿// ***********************************************************************
-//  Assembly         : RzR.Shared.Services.SoapClientCallAssist
-//  Author           : RzR
-//  Created On       : 2024-09-13 19:28
+//  Assembly          : RzR.Shared.Services.SoapClientCallAssist
+//  Author            : RzR
+//  Created On        : 2024-09-13 19:28
 // 
 //  Last Modified By : RzR
-//  Last Modified On : 2024-09-15 19:23
-// ***********************************************************************
-//  <copyright file="SoapXmlHelper.cs" company="">
-//   Copyright (c) RzR. All rights reserved.
+//  Last Modified On : 2026-08-31 20:42
+//  ***********************************************************************
+//  <copyright file="SoapXmlHelper.cs" company="RzR SOFT & TECH">
+//      Copyright (c) RzR. All rights reserved.
 //  </copyright>
-// 
-//  <summary>
-//  </summary>
-// ***********************************************************************
+//  <contact>
+//      https://iamrzr.dev/contact
+//  </contact>
+//  <summary></summary>
+//  ***********************************************************************
 
-#region U S A G E S
+#region U S I N G
 
 using RzR.Extensions.Domain.Collections;
 using RzR.Extensions.Domain.Primitives;
@@ -34,25 +35,24 @@ using System.Xml.Linq;
 
 namespace SoapClientCallAssist.Helper
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     A SOAP XML helper.
     /// </summary>
-    /// =================================================================================================
     internal static class SoapXmlHelper
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Verify and build get segment.
         /// </summary>
         /// <param name="method">The method.</param>
         /// <param name="soapUri">URI of the SOAP.</param>
         /// <param name="bodies">The bodies.</param>
-        /// <param name="buildGetRequestAsSlashUrl">Build current SOAP GET request as URL with slash ex: 'http:/site.local/GetDocuments/1'</param>
+        /// <param name="buildGetRequestAsSlashUrl">
+        ///     (Optional)
+        ///     Build current SOAP GET request as URL with slash ex: 'http:/site.local/GetDocuments/1'.
+        /// </param>
         /// <returns>
         ///     An IResult&lt;HttpRequestMessage&gt;
         /// </returns>
-        /// =================================================================================================
         internal static IResult<HttpRequestMessage> VerifyAndBuildGetSegment(HttpMethod method, Uri soapUri,
             IEnumerable<XElement> bodies, bool buildGetRequestAsSlashUrl = false)
         {
@@ -72,11 +72,10 @@ namespace SoapClientCallAssist.Helper
 
                 return Result<HttpRequestMessage>.Success(new HttpRequestMessage(method, paramsUri));
             }
-            else
-                return Result<HttpRequestMessage>.Success(new HttpRequestMessage(method, soapUri));
+
+            return Result<HttpRequestMessage>.Success(new HttpRequestMessage(method, soapUri));
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Enumerates check and validate SOAP bodies in this collection.
         /// </summary>
@@ -85,7 +84,6 @@ namespace SoapClientCallAssist.Helper
         ///     An enumerator that allows foreach to be used to process check and validate SOAP bodies in
         ///     this collection.
         /// </returns>
-        /// =================================================================================================
         internal static IEnumerable<XElement> CheckAndValidateSoapBodies(IEnumerable<XElement> bodies)
         {
             var soapBodies = new List<XElement>();
@@ -94,8 +92,7 @@ namespace SoapClientCallAssist.Helper
                 var bodyNs = XElement.Parse(body.ToString()).Attribute("xmlns");
                 if (bodyNs.IsNotNull())
                 {
-                    var anyParamWithNoNs = body.Descendants().Any(
-                        x => XElement.Parse(x.ToString()).Attribute("xmlns").IsNull()
+                    var anyParamWithNoNs = body.Descendants().Any(x => XElement.Parse(x.ToString()).Attribute("xmlns").IsNull()
                     );
                     if (anyParamWithNoNs.IsTrue())
                     {
@@ -103,20 +100,15 @@ namespace SoapClientCallAssist.Helper
                         soapBodies.Add(newBody);
                     }
                     else
-                    {
                         soapBodies.Add(body);
-                    }
                 }
                 else
-                {
                     soapBodies.Add(body);
-                }
             }
 
             return soapBodies;
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Parse get content body.
         /// </summary>
@@ -126,8 +118,8 @@ namespace SoapClientCallAssist.Helper
         /// <returns>
         ///     An XmlNodeList.
         /// </returns>
-        /// =================================================================================================
-        internal static XmlNodeList ParseGetContentBody(string xmlBodyTag, XmlDocument xmlDocument, string soapNamespace = null)
+        internal static XmlNodeList ParseGetContentBody(string xmlBodyTag, XmlDocument xmlDocument,
+            string soapNamespace = null)
         {
             if (xmlBodyTag.IsNullOrEmpty())
             {
@@ -141,15 +133,21 @@ namespace SoapClientCallAssist.Helper
 
                 return asmx.IsNull() ? wcf : asmx;
             }
-            else
-            {
-                return soapNamespace.IsNullOrEmpty()
-                    ? xmlDocument.GetElementsByTagName(xmlBodyTag)
-                    : xmlDocument.GetElementsByTagName(xmlBodyTag, soapNamespace!);
-            }
+
+            return soapNamespace.IsNullOrEmpty()
+                ? xmlDocument.GetElementsByTagName(xmlBodyTag)
+                : xmlDocument.GetElementsByTagName(xmlBodyTag, soapNamespace!);
         }
 
-        internal static void BuildSoapHeader(ref XElement soapEnvelope, IEnumerable<XElement> headers, XNamespace soapNamespace, string action)
+        /// <summary>
+        ///     Builds SOAP header.
+        /// </summary>
+        /// <param name="soapEnvelope">[in,out] The SOAP envelope.</param>
+        /// <param name="headers">The headers.</param>
+        /// <param name="soapNamespace">The SOAP namespace.</param>
+        /// <param name="action">The action.</param>
+        internal static void BuildSoapHeader(ref XElement soapEnvelope, IEnumerable<XElement> headers,
+            XNamespace soapNamespace, string action)
         {
             if (headers.IsNullOrEmptyEnumerable().IsFalse())
             {
@@ -163,12 +161,13 @@ namespace SoapClientCallAssist.Helper
             {
                 //new XAttribute(soapNamespace + "mustUnderstand", "1"),
                 if (action.IsNullOrEmpty().IsFalse())
+                {
                     soapEnvelope.Add(new XElement(soapNamespace + "Header",
                         new XElement("Action", action)));
+                }
             }
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Builds new body.
         /// </summary>
@@ -176,7 +175,6 @@ namespace SoapClientCallAssist.Helper
         /// <returns>
         ///     An XElement.
         /// </returns>
-        /// =================================================================================================
         private static XElement BuildNewBody(XElement body)
         {
             var currentNs = body.Name.Namespace;

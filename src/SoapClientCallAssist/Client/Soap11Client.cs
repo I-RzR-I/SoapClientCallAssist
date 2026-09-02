@@ -1,20 +1,21 @@
 ﻿// ***********************************************************************
-//  Assembly         : RzR.Shared.Services.SoapClientCallAssist
-//  Author           : RzR
-//  Created On       : 2024-09-12 19:05
+//  Assembly          : RzR.Shared.Services.SoapClientCallAssist
+//  Author            : RzR
+//  Created On        : 2024-09-12 19:05
 // 
 //  Last Modified By : RzR
-//  Last Modified On : 2024-09-15 19:25
-// ***********************************************************************
-//  <copyright file="Soap11Client.cs" company="">
-//   Copyright (c) RzR. All rights reserved.
+//  Last Modified On : 2026-08-31 20:42
+//  ***********************************************************************
+//  <copyright file="Soap11Client.cs" company="RzR SOFT & TECH">
+//      Copyright (c) RzR. All rights reserved.
 //  </copyright>
-// 
-//  <summary>
-//  </summary>
-// ***********************************************************************
+//  <contact>
+//      https://iamrzr.dev/contact
+//  </contact>
+//  <summary></summary>
+//  ***********************************************************************
 
-#region U S A G E S
+#region U S I N G
 
 using RzR.Extensions.Domain.Primitives;
 using RzR.ResultMessage;
@@ -37,29 +38,27 @@ using System.Xml.Linq;
 
 namespace SoapClientCallAssist.Client
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     SOAP 1.1 client.
     /// </summary>
-    /// <seealso cref="T:SoapClientCallAssist.Client.BaseEndpointClient" />
-    /// <seealso cref="T:SoapClientCallAssist.Abstractions.ISoapClientEndpoint" />
-    /// =================================================================================================
+    /// <seealso cref="T:SoapClientCallAssist.Client.BaseEndpointClient"/>
+    /// <seealso cref="T:SoapClientCallAssist.Abstractions.ISoapClientEndpoint">
+    ///     =================================================================================================
+    /// </seealso>
     public sealed class Soap11Client : BaseEndpointClient, ISoapClientEndpoint
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     The client time out.
         /// </summary>
-        /// =================================================================================================
         private TimeSpan _clientTimeOut = TimeSpan.FromMinutes(2);
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public Soap11Client(IHttpClientFactory clientFactory) : base(clientFactory) { }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public Soap11Client() { }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public IResult<HttpRequestMessage> BuildRequest(
             HttpMethod method,
             Uri endpoint,
@@ -76,21 +75,21 @@ namespace SoapClientCallAssist.Client
                 var requestMessage = BuildRequest(
                     method,
                     new BuildSoapRequestDto(
-                        new HttpClientDto()
+                        new HttpClientDto
                         {
                             BodyEncoding = bodyEncoding,
                             BuildGetRequestAsSlashUrl = buildGetRequestAsSlashUrl,
-                            Endpoint = endpoint,
+                            Endpoint = endpoint, 
                             HttpClientHeaders = httpClientHeaders
                         },
-                        new SoapEnvelopeDto()
+                        new SoapEnvelopeDto
                         {
                             Bodies = bodies,
-                            Headers = headers,
+                            Headers = headers, 
                             OwnSoapEnvelopeAttributes = ownSoapEnvelopeAttributes,
                             Action = action
                         }
-                        ));
+                    ));
 
                 return requestMessage.IsSuccess.IsFalse()
                     ? Result<HttpRequestMessage>.Failure(requestMessage.GetFirstMessage())
@@ -104,7 +103,7 @@ namespace SoapClientCallAssist.Client
             }
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public IResult<HttpRequestMessage> BuildRequest(HttpMethod method, BuildSoapRequestDto soapRequest)
         {
             try
@@ -138,7 +137,7 @@ namespace SoapClientCallAssist.Client
             }
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public IResult<HttpResponseMessage> SendRequest(HttpRequestMessage request)
         {
             try
@@ -157,8 +156,9 @@ namespace SoapClientCallAssist.Client
             }
         }
 
-        /// <inheritdoc />
-        public async Task<IResult<HttpResponseMessage>> SendRequestAsync(HttpRequestMessage request,
+        /// <inheritdoc/>
+        public async Task<IResult<HttpResponseMessage>> SendRequestAsync(
+            HttpRequestMessage request,
             CancellationToken cancellationToken = default)
         {
             try
@@ -177,7 +177,7 @@ namespace SoapClientCallAssist.Client
             }
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public IResult SetClientTimeout(TimeSpan clientTimeout)
         {
             if (clientTimeout.IsNotNull())
@@ -186,7 +186,7 @@ namespace SoapClientCallAssist.Client
             return Result.Success();
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public IResult CheckBodyForFaultCode(string soapResponse)
             => base.CheckBodyForFaultCode(soapResponse, SoapNamespaceType.Soap11.GetDescription());
     }

@@ -1,21 +1,23 @@
 ﻿// ***********************************************************************
-//  Assembly         : RzR.Shared.Services.SoapClientCallAssist
-//  Author           : RzR
-//  Created On       : 2024-09-12 18:46
+//  Assembly          : RzR.Shared.Services.SoapClientCallAssist
+//  Author            : RzR
+//  Created On        : 2024-09-12 18:46
 // 
 //  Last Modified By : RzR
-//  Last Modified On : 2024-09-12 18:46
-// ***********************************************************************
-//  <copyright file="SoapProtocolType.cs" company="">
-//   Copyright (c) RzR. All rights reserved.
+//  Last Modified On : 2026-08-31 20:42
+//  ***********************************************************************
+//  <copyright file="SoapProtocolType.cs" company="RzR SOFT & TECH">
+//      Copyright (c) RzR. All rights reserved.
 //  </copyright>
-// 
-//  <summary>
-//  </summary>
-// ***********************************************************************
+//  <contact>
+//      https://iamrzr.dev/contact
+//  </contact>
+//  <summary></summary>
+//  ***********************************************************************
 
 // ReSharper disable InconsistentNaming
 // 
+
 namespace SoapClientCallAssist.Enums
 {
     /// -------------------------------------------------------------------------------------------------
@@ -33,6 +35,6 @@ namespace SoapClientCallAssist.Enums
         /// <summary>
         ///     SOAP 1.2
         /// </summary>
-        SOAP_1_2,
+        SOAP_1_2
     }
 }

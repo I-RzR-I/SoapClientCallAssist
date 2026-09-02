@@ -1,20 +1,21 @@
 ﻿// ***********************************************************************
-//  Assembly         : RzR.Shared.Services.SoapClientCallAssist
-//  Author           : RzR
-//  Created On       : 2024-04-19 17:42
+//  Assembly          : RzR.Shared.Services.SoapClientCallAssist
+//  Author            : RzR
+//  Created On        : 2024-04-19 17:42
 // 
 //  Last Modified By : RzR
-//  Last Modified On : 2024-04-21 22:57
-// ***********************************************************************
-//  <copyright file="GeneralAssemblyInfo.cs" company="">
-//   Copyright (c) RzR. All rights reserved.
+//  Last Modified On : 2026-08-31 20:42
+//  ***********************************************************************
+//  <copyright file="GeneralAssemblyInfo.cs" company="RzR SOFT & TECH">
+//      Copyright (c) RzR. All rights reserved.
 //  </copyright>
-// 
-//  <summary>
-//  </summary>
-// ***********************************************************************
+//  <contact>
+//      https://iamrzr.dev/contact
+//  </contact>
+//  <summary></summary>
+//  ***********************************************************************
 
-#region U S A G E S
+#region U S I N G
 
 using System.Reflection;
 using System.Resources;
@@ -31,7 +32,9 @@ using System.Resources;
 [assembly: AssemblyProduct("SoapClientCallAssist")]
 [assembly: AssemblyCopyright("Copyright © 2022-2026 RzR All rights reserved.")]
 [assembly: AssemblyTrademark("® RzR™")]
-[assembly: AssemblyDescription("Provides a more easy way to implement and invoke SOAP(1.1, 1.2) service(`WCF`, `ASMX`) endpoints avoiding dependency on the `WSDL` definition and build requests with minimum required info (basic definition: `Action`, `XML`, `HTTP method`, etc).")]
+[assembly:
+    AssemblyDescription(
+        "Provides a more easy way to implement and invoke SOAP(1.1, 1.2) service(`WCF`, `ASMX`) endpoints avoiding dependency on the `WSDL` definition and build requests with minimum required info (basic definition: `Action`, `XML`, `HTTP method`, etc).")]
 
 [assembly: AssemblyMetadata("TermsOfService", "")]
 [assembly: AssemblyMetadata("ContactUrl", "")]

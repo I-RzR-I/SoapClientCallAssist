@@ -1,20 +1,21 @@
 ﻿// ***********************************************************************
-//  Assembly         : RzR.Shared.Services.SoapClientCallAssist
-//  Author           : RzR
-//  Created On       : 2024-09-12 18:48
+//  Assembly          : RzR.Shared.Services.SoapClientCallAssist
+//  Author            : RzR
+//  Created On        : 2024-09-12 18:48
 // 
 //  Last Modified By : RzR
-//  Last Modified On : 2024-09-13 16:35
-// ***********************************************************************
-//  <copyright file="ISoapClientEndpoint.cs" company="">
-//   Copyright (c) RzR. All rights reserved.
+//  Last Modified On : 2026-08-31 20:42
+//  ***********************************************************************
+//  <copyright file="ISoapClientEndpoint.cs" company="RzR SOFT & TECH">
+//      Copyright (c) RzR. All rights reserved.
 //  </copyright>
-// 
-//  <summary>
-//  </summary>
-// ***********************************************************************
+//  <contact>
+//      https://iamrzr.dev/contact
+//  </contact>
+//  <summary></summary>
+//  ***********************************************************************
 
-#region U S A G E S
+#region U S I N G
 
 using RzR.ResultMessage.Abstractions;
 using SoapClientCallAssist.Dto.Public;
@@ -31,14 +32,11 @@ using System.Xml.Linq;
 
 namespace SoapClientCallAssist.Abstractions
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     SOAP client endpoint.
     /// </summary>
-    /// =================================================================================================
     public interface ISoapClientEndpoint
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Sends a request.
         /// </summary>
@@ -59,7 +57,6 @@ namespace SoapClientCallAssist.Abstractions
         /// <returns>
         ///     An IResult&lt;HttpRequestMessage&gt;
         /// </returns>
-        /// =================================================================================================
         IResult<HttpRequestMessage> BuildRequest(
             HttpMethod method,
             Uri endpoint,
@@ -71,7 +68,6 @@ namespace SoapClientCallAssist.Abstractions
             Dictionary<string, IEnumerable<string>> httpClientHeaders = null,
             bool buildGetRequestAsSlashUrl = false);
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Sends a request.
         /// </summary>
@@ -80,12 +76,10 @@ namespace SoapClientCallAssist.Abstractions
         /// <returns>
         ///     An IResult&lt;HttpRequestMessage&gt;
         /// </returns>
-        /// =================================================================================================
         IResult<HttpRequestMessage> BuildRequest(
             HttpMethod method,
             BuildSoapRequestDto soapRequest);
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Sends a request.
         /// </summary>
@@ -93,10 +87,8 @@ namespace SoapClientCallAssist.Abstractions
         /// <returns>
         ///     An IResult&lt;HttpResponseMessage&gt;
         /// </returns>
-        /// =================================================================================================
         IResult<HttpResponseMessage> SendRequest(HttpRequestMessage request);
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Sends a request asynchronous.
         /// </summary>
@@ -107,10 +99,9 @@ namespace SoapClientCallAssist.Abstractions
         /// <returns>
         ///     The send request.
         /// </returns>
-        /// =================================================================================================
-        Task<IResult<HttpResponseMessage>> SendRequestAsync(HttpRequestMessage request, CancellationToken cancellationToken = default);
+        Task<IResult<HttpResponseMessage>> SendRequestAsync(HttpRequestMessage request,
+            CancellationToken cancellationToken = default);
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Sets client timeout.
         /// </summary>
@@ -118,10 +109,8 @@ namespace SoapClientCallAssist.Abstractions
         /// <returns>
         ///     An IResult.
         /// </returns>
-        /// =================================================================================================
         IResult SetClientTimeout(TimeSpan clientTimeout);
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Check body for fault code.
         /// </summary>
@@ -129,10 +118,8 @@ namespace SoapClientCallAssist.Abstractions
         /// <returns>
         ///     An IResult.
         /// </returns>
-        /// =================================================================================================
         IResult CheckBodyForFaultCode(string soapResponse);
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets XmlNode response body.
         /// </summary>
@@ -142,10 +129,8 @@ namespace SoapClientCallAssist.Abstractions
         /// <returns>
         ///     The response body.
         /// </returns>
-        /// =================================================================================================
         IResult<XmlNode> GetXmlNodeResponseBody(string soapResponse, string soapNamespace = null, string soapXmlBodyTag = null);
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Gets XNode response body.
         /// </summary>
@@ -155,7 +140,6 @@ namespace SoapClientCallAssist.Abstractions
         /// <returns>
         ///     The response body.
         /// </returns>
-        /// =================================================================================================
         IResult<XNode> GetXNodeResponseBody(string soapResponse, string soapNamespace = null, string soapXmlBodyTag = null);
     }
 }

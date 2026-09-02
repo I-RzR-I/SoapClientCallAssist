@@ -1,52 +1,53 @@
 ﻿// ***********************************************************************
-//  Assembly         : RzR.Shared.Services.SoapClientCallAssist
-//  Author           : RzR
-//  Created On       : 2024-09-12 19:03
+//  Assembly          : RzR.Shared.Services.SoapClientCallAssist
+//  Author            : RzR
+//  Created On        : 2024-09-12 19:03
 // 
 //  Last Modified By : RzR
-//  Last Modified On : 2024-09-15 18:43
-// ***********************************************************************
-//  <copyright file="SoapClientEndpointExtensions.cs" company="">
-//   Copyright (c) RzR. All rights reserved.
+//  Last Modified On : 2026-08-31 20:42
+//  ***********************************************************************
+//  <copyright file="SoapClientEndpointExtensions.cs" company="RzR SOFT & TECH">
+//      Copyright (c) RzR. All rights reserved.
 //  </copyright>
-// 
-//  <summary>
-//  </summary>
-// ***********************************************************************
+//  <contact>
+//      https://iamrzr.dev/contact
+//  </contact>
+//  <summary></summary>
+//  ***********************************************************************
 
-#region U S A G E S
+#region U S I N G
 
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using SoapClientCallAssist.Abstractions;
 using SoapClientCallAssist.Client;
 using SoapClientCallAssist.Enums;
 using SoapClientCallAssist.Helper;
+using SoapClientCallAssist.Mapping;
 using System;
 
 #endregion
 
 namespace SoapClientCallAssist
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     A SOAP client endpoint extensions.
     /// </summary>
-    /// =================================================================================================
     public static class SoapClientEndpointExtensions
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     An IServiceCollection extension method that registers the SOAP clients endpoint described
         ///     by services.
         /// </summary>
         /// <param name="services">The services to act on.</param>
-        /// =================================================================================================
         public static void RegisterSoapClientsEndpoint(this IServiceCollection services)
         {
             services.AddHttpClient();
 
             services.AddSingleton<Soap11Client>();
             services.AddSingleton<Soap12Client>();
+
+            services.TryAddSingleton<ISoapModelMapper, SoapModelMapper>();
 
             services.AddSingleton<Func<SoapProtocolType, ISoapClientEndpoint>>(sp => endpointType =>
             {

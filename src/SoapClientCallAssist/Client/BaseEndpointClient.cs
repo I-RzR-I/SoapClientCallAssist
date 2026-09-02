@@ -1,20 +1,21 @@
 ﻿// ***********************************************************************
-//  Assembly         : RzR.Shared.Services.SoapClientCallAssist
-//  Author           : RzR
-//  Created On       : 2024-09-12 19:14
+//  Assembly          : RzR.Shared.Services.SoapClientCallAssist
+//  Author            : RzR
+//  Created On        : 2024-09-12 19:14
 // 
 //  Last Modified By : RzR
-//  Last Modified On : 2024-09-15 19:26
-// ***********************************************************************
-//  <copyright file="BaseEndpointClient.cs" company="">
-//   Copyright (c) RzR. All rights reserved.
+//  Last Modified On : 2026-08-31 20:42
+//  ***********************************************************************
+//  <copyright file="BaseEndpointClient.cs" company="RzR SOFT & TECH">
+//      Copyright (c) RzR. All rights reserved.
 //  </copyright>
-// 
-//  <summary>
-//  </summary>
-// ***********************************************************************
+//  <contact>
+//      https://iamrzr.dev/contact
+//  </contact>
+//  <summary></summary>
+//  ***********************************************************************
 
-#region U S A G E S
+#region U S I N G
 
 using Microsoft.Extensions.DependencyInjection;
 using RzR.Extensions.Domain.Collections;
@@ -25,6 +26,7 @@ using RzR.ResultMessage;
 using RzR.ResultMessage.Abstractions;
 using RzR.ResultMessage.Extensions.Result;
 using SoapClientCallAssist.Abstractions;
+using SoapClientCallAssist.Dto;
 using SoapClientCallAssist.Enums;
 using SoapClientCallAssist.Helper;
 using System;
@@ -36,11 +38,10 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Xml;
 using System.Xml.Linq;
 using Messages = SoapClientCallAssist.Helper.DefaultResultMessageHelper;
 using MessageCodes = SoapClientCallAssist.Enums.MessageCodesType;
-using System.Xml;
-using SoapClientCallAssist.Dto;
 
 #endregion
 
@@ -48,45 +49,34 @@ using SoapClientCallAssist.Dto;
 
 namespace SoapClientCallAssist.Client
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     A base endpoint client.
     /// </summary>
-    /// =================================================================================================
     public abstract class BaseEndpointClient
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     (Immutable)
         ///     HTTP client factory.
         /// </summary>
-        /// =================================================================================================
         private readonly IHttpClientFactory _clientFactory;
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     (Immutable)
         ///     The client time out.
         /// </summary>
-        /// =================================================================================================
         private readonly TimeSpan _clientTimeOut = TimeSpan.FromMinutes(2);
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Initializes a new instance of the <see cref="BaseEndpointClient" /> class.
         /// </summary>
         /// <param name="clientFactory">HTTP client factory.</param>
-        /// =================================================================================================
         protected BaseEndpointClient(IHttpClientFactory clientFactory) => _clientFactory = clientFactory;
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Initializes a new instance of the <see cref="BaseEndpointClient" /> class.
         /// </summary>
-        /// =================================================================================================
         protected BaseEndpointClient() => _clientFactory = DefaultHttpClientFactory();
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Sends a request.
         /// </summary>
@@ -98,7 +88,6 @@ namespace SoapClientCallAssist.Client
         /// <returns>
         ///     An IResult&lt;HttpResponseMessage&gt;
         /// </returns>
-        /// =================================================================================================
         protected IResult<HttpResponseMessage> SendRequest(HttpRequestMessage requestMessage, TimeSpan clientTimeOut = default)
         {
             try
@@ -118,7 +107,6 @@ namespace SoapClientCallAssist.Client
             }
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Sends a request asynchronous.
         /// </summary>
@@ -133,7 +121,6 @@ namespace SoapClientCallAssist.Client
         /// <returns>
         ///     The send request.
         /// </returns>
-        /// =================================================================================================
         protected async Task<IResult<HttpResponseMessage>> SendRequestAsync(
             HttpRequestMessage requestMessage, TimeSpan clientTimeOut = default,
             CancellationToken cancellationToken = default)
@@ -155,7 +142,6 @@ namespace SoapClientCallAssist.Client
             }
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Builds SOAP request message.
         /// </summary>
@@ -163,7 +149,6 @@ namespace SoapClientCallAssist.Client
         /// <returns>
         ///     An IResult&lt;HttpRequestMessage&gt;
         /// </returns>
-        /// =================================================================================================
         protected IResult<HttpRequestMessage> BuildSoapRequestMessage(BaseSoapRequestDto soapRequest)
         {
             try
@@ -187,11 +172,11 @@ namespace SoapClientCallAssist.Client
                     httpRequestMessage = getRequest.Response;
                 }
 
-                var soapEnvelopeAttributes = new List<XAttribute>()
+                var soapEnvelopeAttributes = new List<XAttribute>
                 {
-                    new XAttribute(XNamespace.Xmlns + "soap", soapRequest.SoapNameSpaceEnvelope.NamespaceName),
-                    new XAttribute(XNamespace.Xmlns + "xsi", "http://www.w3.org/2001/XMLSchema-instance"),
-                    new XAttribute(XNamespace.Xmlns + "i", "http://www.w3.org/2001/XMLSchema-instance")
+                    new(XNamespace.Xmlns + "soap", soapRequest.SoapNameSpaceEnvelope.NamespaceName),
+                    new(XNamespace.Xmlns + "xsi", "http://www.w3.org/2001/XMLSchema-instance"),
+                    new(XNamespace.Xmlns + "i", "http://www.w3.org/2001/XMLSchema-instance")
                 };
 
                 if (soapRequest.OwnSoapEnvelopeAttributes.IsNullOrEmptyEnumerable().IsFalse())
@@ -221,8 +206,10 @@ namespace SoapClientCallAssist.Client
                     content.Headers.ContentType!.Parameters.Add(new NameValueHeaderValue("ActionParameter", $"\"{soapRequest.Action}\""));
 
                 if (soapRequest.HttpClientHeaders.IsNullOrEmptyEnumerable().IsFalse())
+                {
                     foreach (var clientHeader in soapRequest.HttpClientHeaders)
                         content.Headers.TryAddWithoutValidation(clientHeader.Key, clientHeader.Value);
+                }
 
                 httpRequestMessage.Content = content;
 
@@ -236,7 +223,6 @@ namespace SoapClientCallAssist.Client
             }
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Check body for fault code.
         /// </summary>
@@ -245,7 +231,6 @@ namespace SoapClientCallAssist.Client
         /// <returns>
         ///     An IResult.
         /// </returns>
-        /// =================================================================================================
         protected IResult CheckBodyForFaultCode(string soapResponseBody, string soapNamespace)
         {
             try
@@ -321,14 +306,12 @@ namespace SoapClientCallAssist.Client
             }
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Default HTTP client factory.
         /// </summary>
         /// <returns>
         ///     An IHttpClientFactory.
         /// </returns>
-        /// =================================================================================================
         private static IHttpClientFactory DefaultHttpClientFactory()
         {
             var serviceProvider = new ServiceCollection();
@@ -342,7 +325,6 @@ namespace SoapClientCallAssist.Client
                 .GetService<IHttpClientFactory>()!;
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
         ///     Validates the request described by soapRequest.
         /// </summary>
@@ -350,39 +332,52 @@ namespace SoapClientCallAssist.Client
         /// <returns>
         ///     An IResult.
         /// </returns>
-        /// =================================================================================================
         private static IResult ValidateRequest(BaseSoapRequestDto soapRequest)
         {
             try
             {
                 if (soapRequest.IsNull())
+                {
                     return Result.Failure(MessageCodes.V_BEC_VR_001.GetDescription(),
                         Messages.ValidationMessages[MessageCodes.V_BEC_VR_001]);
+                }
 
                 if (new List<HttpMethod> { HttpMethod.Post, HttpMethod.Get }
                     .Any(x => x == soapRequest.Method).IsFalse())
+                {
                     return Result.Failure(MessageCodes.V_BEC_VR_002.GetDescription(),
                         string.Format(Messages.ValidationMessages[MessageCodes.V_BEC_VR_002], soapRequest.Method));
+                }
 
                 if (soapRequest.SoapUri.IsNull())
+                {
                     return Result.Failure(MessageCodes.V_BEC_VR_003.GetDescription(),
                         Messages.ValidationMessages[MessageCodes.V_BEC_VR_003]);
+                }
 
                 if (soapRequest.SoapProtocol.IsNull())
+                {
                     return Result.Failure(MessageCodes.V_BEC_VR_004.GetDescription(),
                         Messages.ValidationMessages[MessageCodes.V_BEC_VR_004]);
+                }
 
                 if (soapRequest.SoapNameSpaceEnvelope.IsNull())
+                {
                     return Result.Failure(MessageCodes.V_BEC_VR_005.GetDescription(),
                         Messages.ValidationMessages[MessageCodes.V_BEC_VR_005]);
+                }
 
                 if (soapRequest.MediaType.IsNullOrEmpty())
+                {
                     return Result.Failure(MessageCodes.V_BEC_VR_006.GetDescription(),
                         Messages.ValidationMessages[MessageCodes.V_BEC_VR_006]);
+                }
 
                 if (soapRequest.BodyEncoding.IsNull())
+                {
                     return Result.Failure(MessageCodes.V_BEC_VR_007.GetDescription(),
                         Messages.ValidationMessages[MessageCodes.V_BEC_VR_007]);
+                }
 
                 return Result.Success();
             }

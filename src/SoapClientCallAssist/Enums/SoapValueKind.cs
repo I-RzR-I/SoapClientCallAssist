@@ -1,12 +1,12 @@
 ﻿// ***********************************************************************
 //  Assembly          : RzR.Shared.Services.SoapClientCallAssist
 //  Author            : RzR
-//  Created On        : 2024-09-15 18:14
+//  Created On        : 2026-08-31 13:08
 // 
 //  Last Modified By : RzR
 //  Last Modified On : 2026-08-31 20:42
 //  ***********************************************************************
-//  <copyright file="SoapMediaType.cs" company="RzR SOFT & TECH">
+//  <copyright file="SoapValueKind.cs" company="RzR SOFT & TECH">
 //      Copyright (c) RzR. All rights reserved.
 //  </copyright>
 //  <contact>
@@ -15,27 +15,26 @@
 //  <summary></summary>
 //  ***********************************************************************
 
-#region U S I N G
-
-using System.ComponentModel;
-
-#endregion
-
 namespace SoapClientCallAssist.Enums
 {
     /// <summary>
-    ///     Values that represent SOAP media types.
+    ///     Describes how the value of a mapped member is represented in XML.
     /// </summary>
-    internal enum SoapMediaType
+    internal enum SoapValueKind
     {
         /// <summary>
-        ///     An enum constant representing the SOAP 1.1 option.
+        ///     A scalar value written as element text. Covers primitives, string and byte arrays.
         /// </summary>
-        [Description("text/xml")] Soap11,
+        Simple,
 
         /// <summary>
-        ///     An enum constant representing the SOAP 1.2 option.
+        ///     A nested type that carries its own map, resolved on demand.
         /// </summary>
-        [Description("application/soap+xml")] Soap12
+        Complex,
+
+        /// <summary>
+        ///     A repeated value written as a wrapper element containing one child element per item.
+        /// </summary>
+        Collection
     }
 }

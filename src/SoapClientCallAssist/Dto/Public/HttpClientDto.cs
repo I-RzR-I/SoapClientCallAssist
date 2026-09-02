@@ -1,20 +1,21 @@
 ﻿// ***********************************************************************
-//  Assembly         : RzR.Shared.Services.SoapClientCallAssist
-//  Author           : RzR
-//  Created On       : 2024-09-22 18:43
+//  Assembly          : RzR.Shared.Services.SoapClientCallAssist
+//  Author            : RzR
+//  Created On        : 2024-09-22 18:43
 // 
 //  Last Modified By : RzR
-//  Last Modified On : 2024-09-22 18:50
-// ***********************************************************************
-//  <copyright file="HttpClientDto.cs" company="">
-//   Copyright (c) RzR. All rights reserved.
+//  Last Modified On : 2026-08-31 20:42
+//  ***********************************************************************
+//  <copyright file="HttpClientDto.cs" company="RzR SOFT & TECH">
+//      Copyright (c) RzR. All rights reserved.
 //  </copyright>
-// 
-//  <summary>
-//  </summary>
-// ***********************************************************************
+//  <contact>
+//      https://iamrzr.dev/contact
+//  </contact>
+//  <summary></summary>
+//  ***********************************************************************
 
-#region U S A G E S
+#region U S I N G
 
 using RzR.Extensions.Domain.Reflection.TypeParam;
 using System;
@@ -25,71 +26,25 @@ using System.Text;
 
 namespace SoapClientCallAssist.Dto.Public
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
     ///     A HTTP client data transfer object.
     /// </summary>
-    /// =================================================================================================
     public class HttpClientDto
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        ///     Gets or sets the endpoint.
+        ///     Initializes a new instance of the <see cref="HttpClientDto" /> class.
         /// </summary>
-        /// <value>
-        ///     The endpoint.
-        /// </value>
-        /// =================================================================================================
-        public Uri Endpoint { get; set; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        ///     Gets or sets the body encoding.
-        /// </summary>
-        /// <value>
-        ///     The body encoding.
-        /// </value>
-        /// =================================================================================================
-        public Encoding BodyEncoding { get; set; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        ///     Gets or sets the HTTP client headers.
-        /// </summary>
-        /// <value>
-        ///     The HTTP client headers.
-        /// </value>
-        /// =================================================================================================
-        public Dictionary<string, IEnumerable<string>> HttpClientHeaders { get; set; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        ///     Gets or sets a value indicating whether the build get request as slash URL.
-        ///     Build current SOAP GET request as URL with separated param by slash ex: 'http:/site.local/GetDocuments/1'
-        /// </summary>
-        /// <value>
-        ///     True if build get request as slash url, false if not.
-        /// </value>
-        /// =================================================================================================
-        public bool BuildGetRequestAsSlashUrl { get; set; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="HttpClientDto"/> class.
-        /// </summary>
-        /// =================================================================================================
         public HttpClientDto()
         {
             BuildGetRequestAsSlashUrl = false;
             BodyEncoding = Encoding.UTF8;
         }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        ///     Initializes a new instance of the <see cref="HttpClientDto"/> class.
+        ///     Initializes a new instance of the <see cref="HttpClientDto" /> class.
         /// </summary>
         /// <param name="endpoint">The endpoint.</param>
-        /// <param name="bodyEncoding">The body encoding.</param>
+        /// <param name="bodyEncoding">(Optional) The body encoding.</param>
         /// <param name="buildGetRequestAsSlashUrl">
         ///     (Optional) True to build get request as slash URL.
         /// </param>
@@ -97,7 +52,6 @@ namespace SoapClientCallAssist.Dto.Public
         ///     (Optional)
         ///     The HTTP client headers.
         /// </param>
-        /// =================================================================================================
         public HttpClientDto(
             Uri endpoint,
             Encoding bodyEncoding = null,
@@ -109,5 +63,39 @@ namespace SoapClientCallAssist.Dto.Public
             BuildGetRequestAsSlashUrl = buildGetRequestAsSlashUrl.IfIsNull(false);
             HttpClientHeaders = httpClientHeaders ?? new Dictionary<string, IEnumerable<string>>();
         }
+
+        /// <summary>
+        ///     Gets or sets the endpoint.
+        /// </summary>
+        /// <value>
+        ///     The endpoint.
+        /// </value>
+        public Uri Endpoint { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the body encoding.
+        /// </summary>
+        /// <value>
+        ///     The body encoding.
+        /// </value>
+        public Encoding BodyEncoding { get; set; }
+
+        /// <summary>
+        ///     Gets or sets the HTTP client headers.
+        /// </summary>
+        /// <value>
+        ///     The HTTP client headers.
+        /// </value>
+        public Dictionary<string, IEnumerable<string>> HttpClientHeaders { get; set; }
+
+        /// <summary>
+        ///     Gets or sets a value indicating whether the build get request as slash URL. Build current
+        ///     SOAP GET request as URL with separated param by slash ex:
+        ///     'http:/site.local/GetDocuments/1'.
+        /// </summary>
+        /// <value>
+        ///     True if build get request as slash url, false if not.
+        /// </value>
+        public bool BuildGetRequestAsSlashUrl { get; set; }
     }
 }
