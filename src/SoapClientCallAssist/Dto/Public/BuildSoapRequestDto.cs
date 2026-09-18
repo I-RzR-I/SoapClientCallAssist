@@ -4,7 +4,7 @@
 //  Created On        : 2024-09-22 18:33
 // 
 //  Last Modified By : RzR
-//  Last Modified On : 2026-08-31 20:42
+//  Last Modified On : 2026-09-03 00:37
 //  ***********************************************************************
 //  <copyright file="BuildSoapRequestDto.cs" company="RzR SOFT & TECH">
 //      Copyright (c) RzR. All rights reserved.
@@ -18,7 +18,8 @@
 namespace SoapClientCallAssist.Dto.Public
 {
     /// <summary>
-    ///     A build SOAP request data transfer object.
+    ///     The input of a request build, grouping the transport settings, the envelope content and
+    ///     the optional WS-Security options.
     /// </summary>
     public class BuildSoapRequestDto
     {
@@ -32,8 +33,8 @@ namespace SoapClientCallAssist.Dto.Public
         /// <summary>
         ///     Initializes a new instance of the <see cref="BuildSoapRequestDto" /> class.
         /// </summary>
-        /// <param name="client">The client.</param>
-        /// <param name="envelope">The envelope.</param>
+        /// <param name="client">The transport settings of the call.</param>
+        /// <param name="envelope">The envelope content of the call.</param>
         public BuildSoapRequestDto(HttpClientDto client, SoapEnvelopeDto envelope)
         {
             Client = client;
@@ -41,19 +42,19 @@ namespace SoapClientCallAssist.Dto.Public
         }
 
         /// <summary>
-        ///     Gets or sets the client.
+        ///     The endpoint, body encoding, GET URL style and extra HTTP headers of the call.
         /// </summary>
-        /// <value>
-        ///     The client.
-        /// </value>
         public HttpClientDto Client { get; set; }
 
         /// <summary>
-        ///     Gets or sets the envelope.
+        ///     The bodies, headers, action and Envelope attributes of the message.
         /// </summary>
-        /// <value>
-        ///     The envelope.
-        /// </value>
         public SoapEnvelopeDto Envelope { get; set; }
+
+        /// <summary>
+        ///     The WS-Security message signing options, or <see langword="null" /> to send the request
+        ///     unsigned.
+        /// </summary>
+        public SoapSecurityDto Security { get; set; }
     }
 }

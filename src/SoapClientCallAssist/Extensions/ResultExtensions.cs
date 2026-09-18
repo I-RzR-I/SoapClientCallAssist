@@ -30,16 +30,13 @@ using System.Reflection;
 namespace SoapClientCallAssist.Extensions
 {
     /// <summary>
-    ///     A result extensions.
+    ///     Extensions that carry a failure across result types and attach a sanitized exception to it.
     /// </summary>
     internal static class ResultExtensions
     {
         /// <summary>
         ///     Re-raises a failure under a different result type, carrying over every message it holds.
-        ///     A failure that names a concrete cause keeps naming it after it crosses a stage boundary,
-        ///     including the sanitized exception a captured error appends after the first message. Every
-        ///     failure this layer builds carries at least one message, so the empty branch exists only
-        ///     so that a source with no message list cannot throw here; it is not a supported shape. 
+        ///     A source with no messages yields a bare failure.
         /// </summary>
         /// <typeparam name="T">The result type to raise the failure under.</typeparam>
         /// <param name="source">The failed result.</param>
@@ -69,13 +66,8 @@ namespace SoapClientCallAssist.Extensions
             => exception.IsNull() ? failure : failure.WithError(Sanitized(exception, context));
 
         /// <summary>
-        ///     Rebuilds a captured exception as one that names its type and what the library was doing,
-        ///     but carries none of its own text and does not chain the original. An attached exception
-        ///     reaches the consumer through <see cref="IResult.Messages" />, which renders both its
-        ///     message and its full string, and an exception raised over a value routinely quotes that
-        ///     value (<c>FormatException</c> and <c>XmlException</c> both do). The value may be a remote
-        ///     response or a consumer secret, so neither the text nor the original may travel with the
-        ///     failure.
+        ///     Rebuilds a captured exception as an <see cref="InvalidOperationException" /> naming only
+        ///     its type and what the library was doing, with none of its own text and no inner exception. 
         /// </summary>
         /// <param name="exception">The captured exception.</param>
         /// <param name="context">What the library was doing when the exception was raised.</param>
@@ -88,8 +80,8 @@ namespace SoapClientCallAssist.Extensions
                 + "withheld because a message built over a value can carry that value.");
 
         /// <summary>
-        ///     Unwraps the exception a reflected call reports, so that the cause rather than the
-        ///     invocation wrapper is named on the failure.
+        ///     Unwraps a <see cref="TargetInvocationException" /> to its inner exception; any other
+        ///     exception is returned as is.
         /// </summary>
         /// <param name="exception">The captured exception.</param>
         /// <returns>

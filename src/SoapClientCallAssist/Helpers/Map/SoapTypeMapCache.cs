@@ -26,21 +26,18 @@ using System.Collections.Concurrent;
 
 #endregion
 
-namespace SoapClientCallAssist.Helper.Map
+namespace SoapClientCallAssist.Helpers.Map
 {
     /// <summary>
-    ///     Caches the resolved <see cref="SoapTypeMap" /> of each CLR type. Maps are keyed by
-    ///     <see cref="Type" /> and published only once fully built, so readers never observe a
-    ///     partial
-    ///     map. A nested complex member is resolved through this cache on demand rather than while
-    ///     its parent map is being built, which is what keeps a cyclic type graph from recursing
-    ///     forever.
+    ///     Caches the resolved <see cref="SoapTypeMap" /> of each CLR type, publishing a map only once
+    ///     fully built. A nested complex member is resolved on demand, not while its parent map is
+    ///     built.
     /// </summary>
     internal static class SoapTypeMapCache
     {
-
         /// <summary>
-        ///     (Immutable) the resolved maps, keyed by CLR type.
+        ///     (Immutable)
+        ///     The resolved maps, keyed by CLR type.
         /// </summary>
         private static readonly ConcurrentDictionary<Type, SoapTypeMap> Maps = new();
 
@@ -49,12 +46,11 @@ namespace SoapClientCallAssist.Helper.Map
         ///     descending into a nested complex member passes its own depth plus one.
         /// </summary>
         /// <param name="clrType">The type to resolve.</param>
-        /// <param name="inheritedNamespace">
-        ///     The call site namespace inherited by a type that declares none of its own.
-        /// </param>
+        /// <param name="inheritedNamespace">The namespace inherited by a type declaring none.</param>
         /// <param name="depth">The current depth of the graph walk.</param>
         /// <returns>
-        ///     An IResult&lt;SoapTypeMap&gt;.
+        ///     The map on success, or a failed result when the depth reaches the cap, the type is null
+        ///     or the read threw.
         /// </returns>
         internal static IResult<SoapTypeMap> GetMap(Type clrType, string inheritedNamespace, int depth)
         {

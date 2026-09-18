@@ -4,7 +4,7 @@
 //  Created On        : 2026-08-31 16:08
 // 
 //  Last Modified By : RzR
-//  Last Modified On : 2026-08-31 20:42
+//  Last Modified On : 2026-09-10 20:40
 //  ***********************************************************************
 //  <copyright file="XElementExtensions.cs" company="RzR SOFT & TECH">
 //      Copyright (c) RzR. All rights reserved.
@@ -19,7 +19,7 @@
 
 using RzR.Extensions.Domain.Primitives;
 using RzR.Extensions.Domain.Text;
-using SoapClientCallAssist.Helper;
+using SoapClientCallAssist.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,7 +30,7 @@ using System.Xml.Linq;
 namespace SoapClientCallAssist.Extensions
 {
     /// <summary>
-    ///     An element extensions.
+    ///     Element helpers for nil detection, local-name lookup and SOAP envelope structure.
     /// </summary>
     internal static class XElementExtensions
     {
@@ -54,9 +54,8 @@ namespace SoapClientCallAssist.Extensions
         }
 
         /// <summary>
-        ///     Enumerates the element children of a parent that carry the supplied local name. Matching
-        ///     is namespace agnostic, because a service is free to qualify a payload element differently
-        ///     from the contract it publishes.
+        ///     Enumerates the element children of a parent that carry the supplied local name; matching
+        ///     is namespace agnostic.
         /// </summary>
         /// <param name="parent">The parent element.</param>
         /// <param name="localName">The local name to match.</param>
@@ -91,14 +90,42 @@ namespace SoapClientCallAssist.Extensions
             => itemName.IsMissing() ? wrapper.Elements() : wrapper.ByLocalName(itemName);
 
         /// <summary>
-        ///     Determines whether an element is a SOAP body in either protocol namespace.
+        ///     Determines whether an element is a SOAP envelope in either protocol namespace.
         /// </summary>
         /// <param name="element">The element to test.</param>
         /// <returns>
-        ///     True when the element is a SOAP body.
+        ///     True when the element is a SOAP envelope.
         /// </returns>
-        internal static bool IsBody(this XElement element)
-            => string.Equals(element.Name.LocalName, SoapContracts.BodyLocalName, StringComparison.Ordinal)
+        internal static bool IsEnvelope(this XElement element)
+            => string.Equals(element.Name.LocalName, SoapContracts.EnvelopeLocalName, StringComparison.Ordinal)
                && element.Name.NamespaceName.IsProtocolNamespace();
+
+        /// <summary>
+        ///     Returns the only element child of a parent that carries a local name in the parent's own
+        ///     namespace.
+        /// </summary>
+        /// <param name="parent">The parent element.</param>
+        /// <param name="localName">The local name to match.</param>
+        /// <returns>
+        ///     The single matching child, or null when there is none or more than one.
+        /// </returns>
+        internal static XElement SingleChildInOwnNamespace(this XElement parent, string localName)
+        {
+            var matched = parent.Elements(parent.Name.Namespace + localName).Take(2).ToList();
+
+            return matched.Count == 1 ? matched[0] : null;
+        }
+
+        /// <summary>
+        ///     Determines whether a parent carries at least one element child with a local name in the
+        ///     parent's own namespace.
+        /// </summary>
+        /// <param name="parent">The parent element.</param>
+        /// <param name="localName">The local name to match.</param>
+        /// <returns>
+        ///     True when such a child is present.
+        /// </returns>
+        internal static bool HasChildInOwnNamespace(this XElement parent, string localName)
+            => parent.Elements(parent.Name.Namespace + localName).Any();
     }
 }

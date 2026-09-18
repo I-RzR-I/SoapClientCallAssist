@@ -18,9 +18,8 @@
 namespace SoapClientCallAssist.Dto.Map
 {
     /// <summary>
-    ///     One named argument of a SOAP operation. The name is the wire name of the element emitted
-    ///     inside the operation wrapper, which is the parameter name declared by the service, not
-    ///     the name of the CLR type supplied as the value.
+    ///     One named argument of a SOAP operation. <see cref="Name" /> is the parameter name the
+    ///     service declares, emitted as an element inside the operation wrapper.
     /// </summary>
     public sealed class SoapOperationParameter
     {
@@ -28,9 +27,7 @@ namespace SoapClientCallAssist.Dto.Map
         ///     Initializes a new instance of the <see cref="SoapOperationParameter" /> class.
         /// </summary>
         /// <param name="name">The wire name of the parameter element.</param>
-        /// <param name="value">
-        ///     The value to emit, or <see langword="null" /> to omit the element.
-        /// </param>
+        /// <param name="value">The value to emit, or null to omit the element.</param>
         public SoapOperationParameter(string name, object value)
         {
             Name = name;
@@ -41,7 +38,7 @@ namespace SoapClientCallAssist.Dto.Map
         ///     Gets the wire name of the parameter element.
         /// </summary>
         /// <value>
-        ///     The parameter name.
+        ///     The name.
         /// </value>
         public string Name { get; }
 
@@ -49,7 +46,7 @@ namespace SoapClientCallAssist.Dto.Map
         ///     Gets the value to emit. A <see langword="null" /> value omits the element entirely.
         /// </summary>
         /// <value>
-        ///     The parameter value.
+        ///     The value.
         /// </value>
         public object Value { get; }
     }

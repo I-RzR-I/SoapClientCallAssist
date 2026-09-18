@@ -25,10 +25,8 @@ using System.Xml.Linq;
 namespace SoapClientCallAssist.Dto.Map
 {
     /// <summary>
-    ///     A document/literal wrapped operation call: the operation element, the namespace it and
-    ///     its parameter elements are emitted in, and the ordered arguments. A real service
-    ///     operation takes several arguments, so the parameters are a sequence rather than a single
-    ///     model.
+    ///     A document/literal wrapped operation call, made of the operation element, the namespace
+    ///     it and its parameter elements are emitted in, and the ordered arguments.
     /// </summary>
     public sealed class SoapOperationRequest
     {
@@ -42,9 +40,7 @@ namespace SoapClientCallAssist.Dto.Map
         ///     Initializes a new instance of the <see cref="SoapOperationRequest" /> class.
         /// </summary>
         /// <param name="operationName">The local name of the operation element.</param>
-        /// <param name="operationNamespace">
-        ///     The namespace of the operation and its parameter elements.
-        /// </param>
+        /// <param name="operationNamespace">Namespace of the operation and its parameters.</param>
         public SoapOperationRequest(string operationName, XNamespace operationNamespace)
             : this()
         {
@@ -53,18 +49,16 @@ namespace SoapClientCallAssist.Dto.Map
         }
 
         /// <summary>
-        ///     Gets or sets the local name of the operation element, for example
-        ///     <c>AddRecordWithDetailWithLocations</c>.
+        ///     Gets or sets the local name of the operation element.
         /// </summary>
         /// <value>
-        ///     The operation name.
+        ///     The name of the operation.
         /// </value>
         public string OperationName { get; set; }
 
         /// <summary>
-        ///     Gets or sets the namespace of the operation element and of its parameter elements. It
-        ///     must not be empty: an unqualified element is rewritten destructively further down the
-        ///     pipeline.
+        ///     The namespace of the operation element and of its parameter elements. It must not be
+        ///     empty; the emitter refuses an empty one.
         /// </summary>
         /// <value>
         ///     The operation namespace.
@@ -75,7 +69,7 @@ namespace SoapClientCallAssist.Dto.Map
         ///     Gets the arguments of the operation, in the order the service declares them.
         /// </summary>
         /// <value>
-        ///     The ordered parameters.
+        ///     The parameters.
         /// </value>
         public IList<SoapOperationParameter> Parameters { get; }
 
@@ -83,11 +77,9 @@ namespace SoapClientCallAssist.Dto.Map
         ///     Appends one argument to <see cref="Parameters" />.
         /// </summary>
         /// <param name="name">The wire name of the parameter element.</param>
-        /// <param name="value">
-        ///     The value to emit, or <see langword="null" /> to omit the element.
-        /// </param>
+        /// <param name="value">The value to emit, or null to omit the element.</param>
         /// <returns>
-        ///     This instance, so that calls can be chained.
+        ///     This instance, for chained calls.
         /// </returns>
         public SoapOperationRequest AddParameter(string name, object value)
         {

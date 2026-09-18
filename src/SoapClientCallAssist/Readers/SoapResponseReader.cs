@@ -4,7 +4,7 @@
 //  Created On        : 2026-08-31 13:08
 // 
 //  Last Modified By : RzR
-//  Last Modified On : 2026-08-31 20:42
+//  Last Modified On : 2026-09-10 22:10
 //  ***********************************************************************
 //  <copyright file="SoapResponseReader.cs" company="RzR SOFT & TECH">
 //      Copyright (c) RzR. All rights reserved.
@@ -23,65 +23,47 @@ using RzR.ResultMessage;
 using RzR.ResultMessage.Abstractions;
 using SoapClientCallAssist.Dto.Map;
 using SoapClientCallAssist.Enums;
+using SoapClientCallAssist.Exceptions;
 using SoapClientCallAssist.Extensions;
-using SoapClientCallAssist.Helper;
-using SoapClientCallAssist.Helper.Map;
+using SoapClientCallAssist.Helpers;
+using SoapClientCallAssist.Helpers.Map;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
-using Failures = SoapClientCallAssist.Helper.Map.SoapMappingFailure;
+using Failures = SoapClientCallAssist.Helpers.Map.SoapMappingFailure;
 using MessageCodes = SoapClientCallAssist.Enums.MessageCodesType;
-using Messages = SoapClientCallAssist.Helper.DefaultResultMessageHelper;
+using Messages = SoapClientCallAssist.Helpers.DefaultResultMessageHelper;
 
 #endregion
 
 namespace SoapClientCallAssist.Readers
 {
     /// <summary>
-    ///     Binds a SOAP response envelope onto a decorated CLR model. The envelope arrives from a
-    ///     remote endpoint, so it is parsed through a reader that refuses a DTD, resolves nothing
-    ///     externally and is bounded in both document size and nesting depth, and the target type is
-    ///     taken only from the caller's generic argument, never from anything the response says
-    ///     about itself. Every member is total and never throws.
+    ///     Binds a SOAP response envelope onto a decorated CLR model.
     /// </summary>
     internal static class SoapResponseReader
     {
         /// <summary>
-        ///     (Immutable) the marker returned in place of a value when the response carries no element
-        ///     for a member. It is distinct from <see langword="null" />, which is the value of an
-        ///     element explicitly marked nil.
+        ///     (Immutable)
+        ///     The marker returned in place of a value when the response carries no element for a member. 
         /// </summary>
         private static readonly object Unbound = new();
-
-        /// <summary>
-        ///     (Immutable) the signed types an enum may be built on. A value of one of these is widened
-        ///     through <see cref="long" /> before it is read as a bit pattern.
-        /// </summary>
-        private static readonly HashSet<Type> SignedUnderlyingTypes = new()
-        {
-            typeof(sbyte), typeof(short), typeof(int), typeof(long)
-        };
 
         /// <summary>
         ///     Reads a SOAP response envelope into a new instance of <typeparamref name="T" />.
         /// </summary>
         /// <typeparam name="T">
-        ///     The decorated model to bind. It must expose a public parameterless constructor.
+        ///     The decorated model; needs a public parameterless constructor.
         /// </typeparam>
         /// <param name="soapResponse">The raw response envelope.</param>
         /// <param name="protocolNamespace">
-        ///     The expected envelope namespace, used to disambiguate the body. Both SOAP 1.1 and SOAP
-        ///     1.2 are recognised regardless of what is passed, and <see langword="null" /> is accepted.
+        ///     The namespace hint, or null; either protocol is accepted.
         /// </param>
-        /// <param name="bodyTagOverride">
-        ///     The body element name supplied by the caller, with or without a prefix, or
-        ///     <see langword="null" /> to locate the body by SOAP namespace.
-        /// </param>
+        /// <param name="bodyTagOverride">The caller's Body tag, prefix optional, or null.</param>
         /// <returns>
-        ///     An IResult&lt;T&gt;.
+        ///     An IResult&lt;T&gt; carrying the bound instance.
         /// </returns>
         internal static IResult<T> Read<T>(string soapResponse, XNamespace protocolNamespace, string bodyTagOverride)
         {
@@ -93,15 +75,16 @@ namespace SoapClientCallAssist.Readers
         }
 
         /// <summary>
-        ///     Reads a SOAP response envelope into a new instance of the supplied type. This is the core
-        ///     the generic overload delegates to.
+        ///     Reads a SOAP response envelope into a new instance of the supplied type. A Fault counts
+        ///     only as a direct child of the single Body under the envelope.
         /// </summary>
         /// <param name="targetType">The decorated model to bind.</param>
         /// <param name="soapResponse">The raw response envelope.</param>
-        /// <param name="protocolNamespace">The expected envelope namespace, or null.</param>
-        /// <param name="bodyTagOverride">The caller supplied body element name, or null.</param>
+        /// <param name="protocolNamespace">The namespace hint, or null.</param>
+        /// <param name="bodyTagOverride">The caller supplied Body tag, or null.</param>
         /// <returns>
-        ///     An IResult&lt;object&gt; carrying the bound instance.
+        ///     The bound instance, or a failed result for an unreadable document, a missing or empty
+        ///     Body, a fault, or an operation element not matching the type.
         /// </returns>
         internal static IResult<object> Read(Type targetType, string soapResponse,
             XNamespace protocolNamespace, string bodyTagOverride)
@@ -121,20 +104,29 @@ namespace SoapClientCallAssist.Readers
                 if (parsed.IsSuccess.IsFalse())
                     return parsed.Propagate<object>();
 
-                var envelope = parsed.Response;
-
-                if (CarriesFault(envelope))
-                    return FaultFailure(targetType.Name);
-
-                var body = LocateBody(envelope, protocolNamespace, bodyTagOverride);
+                var body = LocateBody(parsed.Response, bodyTagOverride);
                 if (body.IsNull())
                     return Failures.Validation<object>(MessageCodes.V_MAP_009);
+
+                if (body.HasChildInOwnNamespace(SoapContracts.FaultLocalName))
+                    return FaultFailure(targetType.Name);
 
                 var anchor = body.Elements().FirstOrDefault();
                 if (anchor.IsNull())
                     return Failures.Validation<object>(MessageCodes.V_MAP_010, targetType.Name);
 
-                return BindElement(targetType, anchor, InheritedNamespace(anchor, protocolNamespace), 0);
+                var map = SoapTypeMapCache.GetMap(targetType, InheritedNamespace(anchor, protocolNamespace), 0);
+                if (map.IsSuccess.IsFalse())
+                    return map.Propagate<object>();
+
+                var expectedName = map.Response.ElementName.LocalName;
+                if (string.Equals(anchor!.Name.LocalName, expectedName, StringComparison.OrdinalIgnoreCase).IsFalse())
+                {
+                    return Failures.Validation<object>(
+                        MessageCodes.V_MAP_012, anchor.Name.LocalName, targetType.Name, expectedName);
+                }
+
+                return Bind(map.Response, targetType, anchor, 0);
             }
             catch (Exception ex)
             {
@@ -143,10 +135,8 @@ namespace SoapClientCallAssist.Readers
         }
 
         /// <summary>
-        ///     Parses the response through a hardened reader: no DTD, no resolver, a bounded document
-        ///     size and a bounded nesting depth. Entity expansion is closed by prohibiting the DTD,
-        ///     which is what stops an entity being declared at all; the character cap is a second bound
-        ///     rather than the protection itself.
+        ///     Parses the response through the shared hardened reader, reporting a depth stop and
+        ///     malformed XML as a read failure.
         /// </summary>
         /// <param name="soapResponse">The raw response envelope.</param>
         /// <param name="targetTypeName">Name of the target type, used only for diagnostics.</param>
@@ -155,23 +145,14 @@ namespace SoapClientCallAssist.Readers
         /// </returns>
         private static IResult<XElement> Parse(string soapResponse, string targetTypeName)
         {
-            var settings = new XmlReaderSettings
-            {
-                DtdProcessing = DtdProcessing.Prohibit,
-                XmlResolver = null,
-                MaxCharactersFromEntities = SoapContracts.MaxDocumentCharacters,
-                MaxCharactersInDocument = SoapContracts.MaxDocumentCharacters,
-                IgnoreProcessingInstructions = true,
-                IgnoreComments = true,
-                CloseInput = true,
-                ConformanceLevel = ConformanceLevel.Document
-            };
-
             try
             {
-                using (var text = new StringReader(soapResponse))
-                using (var reader = XmlReader.Create(text, settings))
-                    return BuildTree(reader, targetTypeName);
+                using (var reader = SoapXmlDocumentLoader.CreateReader(soapResponse, true))
+                    return Result<XElement>.Success(XElement.Load(reader));
+            }
+            catch (XmlDepthExceededException ex)
+            {
+                return ResponseError<XElement>(targetTypeName, DepthReason(), ex);
             }
             catch (XmlException ex)
             {
@@ -180,137 +161,25 @@ namespace SoapClientCallAssist.Readers
         }
 
         /// <summary>
-        ///     Builds the element tree from a hardened reader, counting nesting depth as it goes.
+        ///     Locates the only Body child of a document element that is an Envelope in either protocol
+        ///     namespace; any prefix is accepted.
         /// </summary>
-        /// <param name="reader">The hardened reader.</param>
-        /// <param name="targetTypeName">Name of the target type, used only for diagnostics.</param>
+        /// <param name="documentElement">The document element.</param>
+        /// <param name="bodyTagOverride">The caller supplied Body tag, or null.</param>
         /// <returns>
-        ///     An IResult&lt;XElement&gt; carrying the document element.
+        ///     The Body element, or null for a non-envelope document, a tag not naming the Body, or no
+        ///     single Body.
         /// </returns>
-        private static IResult<XElement> BuildTree(XmlReader reader, string targetTypeName)
+        private static XElement LocateBody(XElement documentElement, string bodyTagOverride)
         {
-            XElement root = null;
-            var open = new Stack<XElement>();
+            if (SoapXmlHelper.AcceptsBodyTag(bodyTagOverride).IsFalse() || documentElement.IsEnvelope().IsFalse())
+                return null;
 
-            while (reader.Read())
-            {
-                switch (reader.NodeType)
-                {
-                    case XmlNodeType.Element:
-                        if (reader.Depth >= SoapContracts.MaxXmlDepth)
-                            return ResponseError<XElement>(targetTypeName, DepthReason(), null);
-
-                        var isEmpty = reader.IsEmptyElement;
-                        var element = new XElement(XName.Get(reader.LocalName, reader.NamespaceURI));
-                        CopyAttributes(reader, element);
-
-                        if (open.Count == 0)
-                            root = element;
-                        else
-                            open.Peek().Add(element);
-
-                        if (isEmpty.IsFalse())
-                            open.Push(element);
-
-                        break;
-
-                    case XmlNodeType.Text:
-                    case XmlNodeType.CDATA:
-                    case XmlNodeType.SignificantWhitespace:
-                    case XmlNodeType.Whitespace:
-                        if (open.Count > 0)
-                            open.Peek().Add(new XText(reader.Value));
-
-                        break;
-
-                    case XmlNodeType.EndElement:
-                        if (open.Count > 0)
-                            open.Pop();
-
-                        break;
-                }
-            }
-
-            return root.IsNull()
-                ? ResponseError<XElement>(targetTypeName, "the response holds no document element", null)
-                : Result<XElement>.Success(root);
+            return documentElement.SingleChildInOwnNamespace(SoapContracts.BodyLocalName);
         }
 
         /// <summary>
-        ///     Copies the attributes of the current element, skipping namespace declarations, which are
-        ///     markup rather than data and are rebuilt by the element itself.
-        /// </summary>
-        /// <param name="reader">The hardened reader, positioned on an element.</param>
-        /// <param name="element">The element being built.</param>
-        private static void CopyAttributes(XmlReader reader, XElement element)
-        {
-            if (reader.HasAttributes.IsFalse() || reader.MoveToFirstAttribute().IsFalse())
-                return;
-
-            do
-            {
-                if (string.Equals(reader.NamespaceURI, SoapContracts.XmlnsNamespace, StringComparison.Ordinal)
-                    || string.Equals(reader.Name, "xmlns", StringComparison.Ordinal))
-                    continue;
-
-                element.SetAttributeValue(XName.Get(reader.LocalName, reader.NamespaceURI), reader.Value);
-            } while (reader.MoveToNextAttribute());
-
-            reader.MoveToElement();
-        }
-
-        /// <summary>
-        ///     Determines whether the envelope carries a SOAP fault, in either protocol namespace.
-        /// </summary>
-        /// <param name="envelope">The document element.</param>
-        /// <returns>
-        ///     True when a fault is present.
-        /// </returns>
-        private static bool CarriesFault(XElement envelope)
-            => envelope
-                .DescendantsAndSelf()
-                .Any(x => string.Equals(x.Name.LocalName, SoapContracts.FaultLocalName, StringComparison.Ordinal)
-                          && x.Name.NamespaceName.IsProtocolNamespace());
-
-        /// <summary>
-        ///     Locates the single body element. The body is matched by namespace and local name rather
-        ///     than by a literal prefix, so any prefix a service chooses is accepted.
-        /// </summary>
-        /// <param name="envelope">The document element.</param>
-        /// <param name="protocolNamespace">The expected envelope namespace, or null.</param>
-        /// <param name="bodyTagOverride">The caller supplied body element name, or null.</param>
-        /// <returns>
-        ///     The body element, or null when there is not exactly one.
-        /// </returns>
-        private static XElement LocateBody(XElement envelope, XNamespace protocolNamespace, string bodyTagOverride)
-        {
-            if (bodyTagOverride.IsPresent())
-            {
-                var overrideName = bodyTagOverride.LocalPartOf();
-
-                var overridden = Single(envelope
-                    .DescendantsAndSelf()
-                    .Where(x => string.Equals(x.Name.LocalName, overrideName, StringComparison.Ordinal)));
-
-                return overridden.IsNotNull() && overridden.IsBody() ? overridden : null;
-            }
-
-            var candidates = envelope.Elements().Where(x => x.IsBody()).ToList();
-            if (candidates.Count == 0)
-                candidates = envelope.DescendantsAndSelf().Where(x => x.IsBody()).ToList();
-
-            if (protocolNamespace.IsNull())
-                return Single(candidates);
-
-            var preferred = candidates.Where(x => x.Name.Namespace == protocolNamespace).ToList();
-
-            return preferred.Count == 1 ? preferred[0] : Single(candidates);
-        }
-
-        /// <summary>
-        ///     Resolves the namespace a target type inherits when it declares none of its own. The
-        ///     operation response element carries the service contract namespace, which is the closest
-        ///     thing the response offers.
+        ///     Resolves the namespace a target type inherits when it declares none of its own.
         /// </summary>
         /// <param name="anchor">The operation response element.</param>
         /// <param name="protocolNamespace">The expected envelope namespace, or null.</param>
@@ -336,24 +205,38 @@ namespace SoapClientCallAssist.Readers
         /// <returns>
         ///     An IResult&lt;object&gt; carrying the bound instance.
         /// </returns>
-        private static IResult<object> BindElement(
-            Type clrType, XElement element, string inheritedNamespace, int depth)
+        private static IResult<object> BindElement(Type clrType, XElement element, 
+            string inheritedNamespace, int depth)
         {
             var map = SoapTypeMapCache.GetMap(clrType, inheritedNamespace, depth);
-            if (map.IsSuccess.IsFalse())
-                return map.Propagate<object>();
 
+            return map.IsSuccess.IsFalse()
+                ? map.Propagate<object>()
+                : Bind(map.Response, clrType, element, depth);
+        }
+
+        /// <summary>
+        ///     Binds an element onto a new instance of the supplied type through its resolved map.
+        /// </summary>
+        /// <param name="map">The resolved map of the type.</param>
+        /// <param name="clrType">The type to bind.</param>
+        /// <param name="element">The element the members are located from.</param>
+        /// <param name="depth">The current depth of the type graph walk.</param>
+        /// <returns>
+        ///     An IResult&lt;object&gt; carrying the bound instance.
+        /// </returns>
+        private static IResult<object> Bind(SoapTypeMap map, Type clrType, XElement element, int depth)
+        {
             var instance = clrType.CreateInstance();
             if (instance.IsNull())
                 return Failures.Validation<object>(MessageCodes.V_MAP_008, clrType.Name);
 
-            foreach (var member in map.Response.Members)
+            foreach (var member in map.Members)
             {
                 var bound = BindMember(clrType, member, element, depth);
                 if (bound.IsSuccess.IsFalse())
                     return bound;
 
-                // An absent element leaves the member at its CLR default rather than failing.
                 if (ReferenceEquals(bound.Response, Unbound))
                     continue;
 
@@ -382,8 +265,8 @@ namespace SoapClientCallAssist.Readers
         ///     An IResult&lt;object&gt; carrying the value, or the unbound marker when no element
         ///     matched.
         /// </returns>
-        private static IResult<object> BindMember(
-            Type declaringType, SoapMemberMap member, XElement anchor, int depth)
+        private static IResult<object> BindMember(Type declaringType, SoapMemberMap member, 
+            XElement anchor, int depth)
         {
             var container = anchor;
 
@@ -397,7 +280,7 @@ namespace SoapClientCallAssist.Readers
 
             var localName = member.WireName.LocalName;
 
-            if (member.Kind == SoapValueKind.Collection)
+            if (member.Kind == SoapValueKindType.Collection)
                 return BindCollection(declaringType, member, container, localName, depth);
 
             var element = container.FirstByLocalName(localName);
@@ -411,7 +294,7 @@ namespace SoapClientCallAssist.Readers
                     : Failures.Validation<object>(MessageCodes.V_MAP_005, localName, member.Property.Name);
             }
 
-            if (member.Kind == SoapValueKind.Complex)
+            if (member.Kind == SoapValueKindType.Complex)
                 return BindElement(member.MemberType, element, member.WireName.NamespaceName, depth + 1);
 
             return ReadValue(member.MemberType, element.Value, declaringType, member, localName);
@@ -419,10 +302,6 @@ namespace SoapClientCallAssist.Readers
 
         /// <summary>
         ///     Resolves the value of a collection member, in either of the two shapes a service sends.
-        ///     In the wrapped shape an element matching the leaf name holds the items as its element
-        ///     children. In the unwrapped shape, which is what <c>maxOccurs="unbounded"</c> and an ASMX
-        ///     <c>[XmlElement]</c> array produce, the leaf element is repeated once per item and carries
-        ///     the value itself.
         /// </summary>
         /// <param name="declaringType">The type declaring the member.</param>
         /// <param name="member">The member map.</param>
@@ -432,8 +311,8 @@ namespace SoapClientCallAssist.Readers
         /// <returns>
         ///     An IResult&lt;object&gt; carrying the collection, or the unbound marker.
         /// </returns>
-        private static IResult<object> BindCollection(
-            Type declaringType, SoapMemberMap member, XElement container, string localName, int depth)
+        private static IResult<object> BindCollection(Type declaringType, SoapMemberMap member, XElement container,
+            string localName, int depth)
         {
             var matched = container.ByLocalName(localName).ToList();
             if (matched.Count == 0)
@@ -448,7 +327,7 @@ namespace SoapClientCallAssist.Readers
             var expectedItemName = member.ItemName.IsPresent() ? member.ItemName : localName;
             var items = new List<object>();
 
-            var sources = IsUnwrapped(member, matched)
+            var sources = IsUnwrapped(member, matched, itemIsSimple, depth)
                 ? matched
                 : wrappers.SelectMany(x => x.ItemElements(member.ItemName));
 
@@ -485,25 +364,73 @@ namespace SoapClientCallAssist.Readers
                 items.Add(bound.Response);
             }
 
+            if (items.Count == 0 && wrappers.Any(CarriesContent))
+                return ShapeMismatch(declaringType, member, localName);
+
             return Materialize(declaringType, member, items, localName);
         }
 
         /// <summary>
         ///     Determines whether the elements matching the leaf name are the items themselves rather
-        ///     than wrappers around them. A declared item name settles the question on its own, since it
-        ///     only has meaning inside a wrapper. Otherwise the shape decides: an element carrying text
-        ///     but no element child cannot be a wrapper of anything, so reading it as one would bind an
-        ///     empty collection and drop every value the service sent.
+        ///     than wrappers around them.
         /// </summary>
         /// <param name="member">The member map.</param>
         /// <param name="matched">Every element matching the leaf name.</param>
+        /// <param name="itemIsSimple">True when the item type is read from element text.</param>
+        /// <param name="depth">The current depth of the type graph walk.</param>
         /// <returns>
         ///     True when the matched elements are the items.
         /// </returns>
-        private static bool IsUnwrapped(SoapMemberMap member, List<XElement> matched)
-            => member.ItemName.IsMissing()
-               && matched.All(x => x.Elements().Any().IsFalse())
-               && matched.Any(x => x.Value.IsPresent());
+        private static bool IsUnwrapped(SoapMemberMap member, List<XElement> matched, 
+            bool itemIsSimple, int depth)
+        {
+            if (matched.All(x => x.Elements().Any().IsFalse()))
+                return itemIsSimple && (matched.Count > 1 || matched.Any(x => x.Value.IsPresent()));
+
+            if (itemIsSimple || matched.Any(x => x.Elements().Any().IsFalse()))
+                return false;
+
+            if (member.ItemName.IsPresent() && matched.All(x => x.ByLocalName(member.ItemName).Any()))
+                return false;
+
+            return CarriesItemMembers(member, matched, depth);
+        }
+
+        /// <summary>
+        ///     Determines whether every matched element holds a child named after a mapped member of the
+        ///     item type.
+        /// </summary>
+        /// <param name="member">The member map.</param>
+        /// <param name="matched">Every element matching the leaf name.</param>
+        /// <param name="depth">The current depth of the type graph walk.</param>
+        /// <returns>
+        ///     True when the matched elements carry the members of the item type.
+        /// </returns>
+        private static bool CarriesItemMembers(SoapMemberMap member, List<XElement> matched, int depth)
+        {
+            var map = SoapTypeMapCache.GetMap(
+                member.CollectionItemType, member.WireName.NamespaceName, depth + 1);
+
+            if (map.IsSuccess.IsFalse())
+                return matched.Count > 1;
+
+            var names = new HashSet<string>(StringComparer.Ordinal);
+            foreach (var item in map.Response.Members)
+                names.Add(item.WireName.LocalName);
+
+            return matched.All(x => x.Elements().Any(child => names.Contains(child.Name.LocalName)));
+        }
+
+        /// <summary>
+        ///     Determines whether an element carries anything a reader could have bound, being either an
+        ///     element child or text.
+        /// </summary>
+        /// <param name="element">The element to test.</param>
+        /// <returns>
+        ///     True when the element carries content.
+        /// </returns>
+        private static bool CarriesContent(XElement element)
+            => element.Elements().Any() || element.Value.IsPresent();
 
         /// <summary>
         ///     Builds the declared collection type from the bound items.
@@ -515,8 +442,7 @@ namespace SoapClientCallAssist.Readers
         /// <returns>
         ///     An IResult&lt;object&gt; carrying the collection.
         /// </returns>
-        private static IResult<object> Materialize(
-            Type declaringType, SoapMemberMap member, List<object> items, string localName)
+        private static IResult<object> Materialize(Type declaringType, SoapMemberMap member, List<object> items, string localName)
         {
             var itemType = member.CollectionItemType;
 
@@ -572,8 +498,8 @@ namespace SoapClientCallAssist.Readers
         /// <returns>
         ///     An IResult&lt;object&gt; carrying the value.
         /// </returns>
-        private static IResult<object> ReadValue(
-            Type declaredType, string text, Type declaringType, SoapMemberMap member, string localName)
+        private static IResult<object> ReadValue(Type declaredType, string text, Type declaringType,
+            SoapMemberMap member, string localName)
         {
             try
             {
@@ -586,11 +512,10 @@ namespace SoapClientCallAssist.Readers
         }
 
         /// <summary>
-        ///     Converts element text to the declared CLR type. Every conversion is culture invariant, so
-        ///     a response is read the same way on every machine.
+        ///     Converts element text to the declared CLR type, culture invariant.
         /// </summary>
         /// <exception cref="NotSupportedException">
-        ///     Thrown when the requested operation is not supported.
+        ///     Thrown when the declared type has no element-text conversion.
         /// </exception>
         /// <param name="declaredType">The declared CLR type of the value.</param>
         /// <param name="text">The element text.</param>
@@ -667,21 +592,6 @@ namespace SoapClientCallAssist.Readers
         }
 
         /// <summary>
-        ///     Returns the only element of a sequence, or null when the sequence does not hold exactly
-        ///     one.
-        /// </summary>
-        /// <param name="elements">The sequence.</param>
-        /// <returns>
-        ///     The single element, or null.
-        /// </returns>
-        private static XElement Single(IEnumerable<XElement> elements)
-        {
-            var matched = elements.Take(2).ToList();
-
-            return matched.Count == 1 ? matched[0] : null;
-        }
-
-        /// <summary>
         ///     The marker result returned when the response carries no element for a member.
         /// </summary>
         /// <returns>
@@ -690,8 +600,8 @@ namespace SoapClientCallAssist.Readers
         private static IResult<object> Absent() => Result<object>.Success(Unbound);
 
         /// <summary>
-        ///     A failure raised while reading the response envelope. The reason names a condition this
-        ///     library controls; no part of the remote response is ever folded into the text.
+        ///     Builds the failure raised while reading the response envelope; the reason names only a
+        ///     condition this library controls.
         /// </summary>
         /// <typeparam name="T">The result type.</typeparam>
         /// <param name="targetTypeName">Name of the target type.</param>
@@ -707,8 +617,8 @@ namespace SoapClientCallAssist.Readers
                 .WithOptionalError(exception, $"reading the response into '{targetTypeName}'");
 
         /// <summary>
-        ///     The failure raised when the response carries a SOAP fault. The fault text is remote
-        ///     content and is deliberately not surfaced.
+        ///     Builds the failure raised when the response carries a SOAP fault; the fault text is not
+        ///     surfaced.
         /// </summary>
         /// <param name="targetTypeName">Name of the target type.</param>
         /// <returns>
@@ -720,9 +630,8 @@ namespace SoapClientCallAssist.Readers
                 Messages.GetErrorMessage(MessageCodes.ER_MAP_FLT).TryFormatWith(targetTypeName));
 
         /// <summary>
-        ///     A failure raised while binding one member. Only the CLR member, its declaring type and
-        ///     the expected XML name are named; the element value is remote content and is never echoed.
-        /// 
+        ///     Builds the failure raised while binding one member, naming only the CLR member, its
+        ///     declaring type and the expected XML name.
         /// </summary>
         /// <param name="elementName">The expected element local name.</param>
         /// <param name="declaringTypeName">Name of the declaring type.</param>
@@ -731,14 +640,27 @@ namespace SoapClientCallAssist.Readers
         /// <returns>
         ///     A failed IResult&lt;object&gt;.
         /// </returns>
-        private static IResult<object> BindError(
-            string elementName, string declaringTypeName,
+        private static IResult<object> BindError(string elementName, string declaringTypeName,
             string memberName, Exception exception)
             => Result<object>.Failure(
                     MessageCodes.ER_MAP_BND.GetDescription(),
                     Messages.GetErrorMessage(MessageCodes.ER_MAP_BND).TryFormatWith(
                         elementName, declaringTypeName, memberName))
                 .WithOptionalError(exception, $"binding '{declaringTypeName}.{memberName}' from the expected element '{elementName}'");
+
+        /// <summary>
+        ///     The failure raised when a collection element carries content that the chosen shape reads
+        ///     no item from.
+        /// </summary>
+        /// <param name="declaringType">The type declaring the member.</param>
+        /// <param name="member">The member map.</param>
+        /// <param name="localName">The expected leaf local name.</param>
+        /// <returns>
+        ///     A failed IResult&lt;object&gt;.
+        /// </returns>
+        private static IResult<object> ShapeMismatch(Type declaringType, SoapMemberMap member, string localName)
+            => Failures.Validation<object>(
+                MessageCodes.V_MAP_011, localName, declaringType.Name, member.Property.Name);
 
         /// <summary>
         ///     Builds the reason text naming the document size limit.

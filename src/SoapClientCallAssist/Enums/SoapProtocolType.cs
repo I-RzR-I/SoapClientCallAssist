@@ -16,24 +16,21 @@
 //  ***********************************************************************
 
 // ReSharper disable InconsistentNaming
-// 
 
 namespace SoapClientCallAssist.Enums
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
-    ///     SOAP version type.
+    ///     The SOAP protocol versions a client can speak.
     /// </summary>
-    /// =================================================================================================
     public enum SoapProtocolType
     {
         /// <summary>
-        ///     SOAP 1.1
+        ///     The SOAP 1.1 protocol.
         /// </summary>
         SOAP_1_1,
 
         /// <summary>
-        ///     SOAP 1.2
+        ///     The SOAP 1.2 protocol.
         /// </summary>
         SOAP_1_2
     }

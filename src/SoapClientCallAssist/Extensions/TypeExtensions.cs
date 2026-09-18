@@ -4,7 +4,7 @@
 //  Created On        : 2026-08-31 16:08
 // 
 //  Last Modified By : RzR
-//  Last Modified On : 2026-08-31 20:42
+//  Last Modified On : 2026-09-04 22:44
 //  ***********************************************************************
 //  <copyright file="TypeExtensions.cs" company="RzR SOFT & TECH">
 //      Copyright (c) RzR. All rights reserved.
@@ -28,13 +28,12 @@ using System.Reflection;
 namespace SoapClientCallAssist.Extensions
 {
     /// <summary>
-    ///     A type extensions.
+    ///     Type helpers that classify CLR types for mapping and convert enum text.
     /// </summary>
     internal static class TypeExtensions
     {
         /// <summary>
-        ///     (Immutable) the non-primitive CLR types written as element text. The set is never mutated
-        ///     after initialization, so concurrent lookups need no synchronization.
+        ///     The non-primitive CLR types written as element text; never mutated after initialization.
         /// </summary>
         private static readonly HashSet<Type> NonPrimitiveSimpleTypes = new()
         {
@@ -64,9 +63,7 @@ namespace SoapClientCallAssist.Extensions
                || typeof(Delegate).IsAssignableFrom(type);
 
         /// <summary>
-        ///     Creates an instance through the public parameterless constructor. No type is ever
-        ///     resolved from the response, so this only ever runs on a type reached from the caller's
-        ///     own graph.
+        ///     Creates an instance through the public parameterless constructor.
         /// </summary>
         /// <param name="type">The type to instantiate.</param>
         /// <returns>
@@ -86,7 +83,7 @@ namespace SoapClientCallAssist.Extensions
         ///     Converts element text to an enum by member name.
         /// </summary>
         /// <exception cref="FormatException">
-        ///     Thrown when the format of an input is incorrect.
+        ///     Thrown when the text names no declared member or sets a flag bit the enum does not declare.
         /// </exception>
         /// <param name="enumType">The enum type.</param>
         /// <param name="value">The trimmed element text.</param>
@@ -104,15 +101,14 @@ namespace SoapClientCallAssist.Extensions
                 if (IsWithinDeclaredFlags(enumType, parsed).IsFalse())
                     throw new FormatException("The element text sets a bit the enum does not declare.");
             }
-            else if (Enum.IsDefined(enumType, parsed).IsFalse()) throw new FormatException("The element text does not name a declared member of the enum.");
+            else if (Enum.IsDefined(enumType, parsed).IsFalse()) 
+                throw new FormatException("The element text does not name a declared member of the enum.");
 
             return parsed;
         }
 
         /// <summary>
-        ///     Determines whether a parsed [Flags] value sets only bits the enum declares. A numeric
-        ///     literal off the wire is otherwise accepted whole, which would bind a value no combination
-        ///     of declared members can produce.
+        ///     Determines whether a parsed [Flags] value sets only bits the enum declares.
         /// </summary>
         /// <param name="enumType">The enum type.</param>
         /// <param name="parsed">The parsed value.</param>
@@ -123,15 +119,16 @@ namespace SoapClientCallAssist.Extensions
         {
             var declared = 0UL;
             foreach (var value in Enum.GetValues(enumType))
+            {
                 declared |= enumType.ToBits(value);
+            }
 
             return (enumType.ToBits(parsed) & ~declared) == 0UL;
         }
 
         /// <summary>
-        ///     Reads the bit pattern of an enum value. A signed underlying type is widened through
-        ///     <see cref="long" /> first, so a negative member is a bit pattern rather than an overflow.
-        /// 
+        ///     Reads the bit pattern of an enum value, widening a signed underlying type through
+        ///     <see cref="long" /> first.
         /// </summary>
         /// <param name="enumType">The enum type.</param>
         /// <param name="value">The enum value.</param>
@@ -154,19 +151,18 @@ namespace SoapClientCallAssist.Extensions
         }
 
         /// <summary>
-        ///     Determines whether a type can hold a null, which is what an element marked nil binds to.
+        ///     Determines whether a type can hold a null, the value an element marked nil binds to.
         /// </summary>
         /// <param name="type">The type to test.</param>
         /// <returns>
         ///     True when the type accepts null.
         /// </returns>
         internal static bool AcceptsNull(this Type type)
-            => type.IsValueType.IsFalse() || Nullable.GetUnderlyingType(type) != null;
+            => type.IsValueType.IsFalse() || Nullable.GetUnderlyingType(type).IsNotNull();
 
         /// <summary>
-        ///     Determines whether a type is represented as element text. A nullable type is classified
-        ///     by the value it wraps, since a nullable member arrives boxed as its underlying value and
-        ///     is read back into the same underlying type.
+        ///     Determines whether a type is represented as element text, classifying a nullable type by
+        ///     the value it wraps.
         /// </summary>
         /// <param name="type">The type to test, which may be null.</param>
         /// <returns>
@@ -182,8 +178,6 @@ namespace SoapClientCallAssist.Extensions
             if (underlying.IsEnum)
                 return true;
 
-            // Both are primitives to the runtime but carry no XML representation, so they are refused
-            // before the primitive test rather than after it.
             if (underlying == typeof(IntPtr) || underlying == typeof(UIntPtr))
                 return false;
 

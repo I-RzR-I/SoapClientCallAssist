@@ -4,7 +4,7 @@
 //  Created On        : 2026-08-31 13:08
 // 
 //  Last Modified By : RzR
-//  Last Modified On : 2026-08-31 20:42
+//  Last Modified On : 2026-09-04 22:44
 //  ***********************************************************************
 //  <copyright file="SoapMappingFailure.cs" company="RzR SOFT & TECH">
 //      Copyright (c) RzR. All rights reserved.
@@ -22,17 +22,14 @@ using RzR.ResultMessage;
 using RzR.ResultMessage.Abstractions;
 using SoapClientCallAssist.Extensions;
 using MessageCodes = SoapClientCallAssist.Enums.MessageCodesType;
-using Messages = SoapClientCallAssist.Helper.DefaultResultMessageHelper;
+using Messages = SoapClientCallAssist.Helpers.DefaultResultMessageHelper;
 
 #endregion
 
-namespace SoapClientCallAssist.Helper.Map
+namespace SoapClientCallAssist.Helpers.Map
 {
     /// <summary>
-    ///     The single way the mapping layer builds a failed result. Every failure raised while
-    ///     reading metadata, emitting a request or binding a response is constructed here, so
-    ///     message text, message forwarding and the handling of a captured exception are decided
-    ///     once.
+    ///     The single way the mapping layer builds a validation failure.
     /// </summary>
     internal static class SoapMappingFailure
     {

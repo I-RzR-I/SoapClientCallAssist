@@ -27,7 +27,8 @@ using System.Text;
 namespace SoapClientCallAssist.Dto.Public
 {
     /// <summary>
-    ///     A HTTP client data transfer object.
+    ///     The transport settings of a request, made of the endpoint, the body encoding, the GET URL
+    ///     style and any extra HTTP headers.
     /// </summary>
     public class HttpClientDto
     {
@@ -43,15 +44,10 @@ namespace SoapClientCallAssist.Dto.Public
         /// <summary>
         ///     Initializes a new instance of the <see cref="HttpClientDto" /> class.
         /// </summary>
-        /// <param name="endpoint">The endpoint.</param>
-        /// <param name="bodyEncoding">(Optional) The body encoding.</param>
-        /// <param name="buildGetRequestAsSlashUrl">
-        ///     (Optional) True to build get request as slash URL.
-        /// </param>
-        /// <param name="httpClientHeaders">
-        ///     (Optional)
-        ///     The HTTP client headers.
-        /// </param>
+        /// <param name="endpoint">The endpoint URI the request is sent to.</param>
+        /// <param name="bodyEncoding">The body encoding, or null for UTF-8.</param>
+        /// <param name="buildGetRequestAsSlashUrl">True to send GET values as path segments.</param>
+        /// <param name="httpClientHeaders">Extra HTTP headers, or null for none.</param>
         public HttpClientDto(
             Uri endpoint,
             Encoding bodyEncoding = null,
@@ -65,37 +61,25 @@ namespace SoapClientCallAssist.Dto.Public
         }
 
         /// <summary>
-        ///     Gets or sets the endpoint.
+        ///     The endpoint URI the request is sent to.
         /// </summary>
-        /// <value>
-        ///     The endpoint.
-        /// </value>
         public Uri Endpoint { get; set; }
 
         /// <summary>
-        ///     Gets or sets the body encoding.
+        ///     The encoding of the request body. Defaults to UTF-8.
         /// </summary>
-        /// <value>
-        ///     The body encoding.
-        /// </value>
         public Encoding BodyEncoding { get; set; }
 
         /// <summary>
-        ///     Gets or sets the HTTP client headers.
+        ///     Additional HTTP headers added to the request message.
         /// </summary>
-        /// <value>
-        ///     The HTTP client headers.
-        /// </value>
         public Dictionary<string, IEnumerable<string>> HttpClientHeaders { get; set; }
 
         /// <summary>
-        ///     Gets or sets a value indicating whether the build get request as slash URL. Build current
-        ///     SOAP GET request as URL with separated param by slash ex:
-        ///     'http:/site.local/GetDocuments/1'.
+        ///     Whether a GET request appends body values as path segments
+        ///     (<c>http://site.local/GetDocuments/1</c>), not query string parameters. Defaults to
+        ///     false.
         /// </summary>
-        /// <value>
-        ///     True if build get request as slash url, false if not.
-        /// </value>
         public bool BuildGetRequestAsSlashUrl { get; set; }
     }
 }

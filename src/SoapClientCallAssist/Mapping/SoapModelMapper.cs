@@ -4,7 +4,7 @@
 //  Created On        : 2026-08-31 17:08
 // 
 //  Last Modified By : RzR
-//  Last Modified On : 2026-08-31 20:42
+//  Last Modified On : 2026-09-04 22:44
 //  ***********************************************************************
 //  <copyright file="SoapModelMapper.cs" company="RzR SOFT & TECH">
 //      Copyright (c) RzR. All rights reserved.
@@ -20,7 +20,7 @@
 using RzR.ResultMessage.Abstractions;
 using SoapClientCallAssist.Abstractions;
 using SoapClientCallAssist.Dto.Map;
-using SoapClientCallAssist.Helper.Map;
+using SoapClientCallAssist.Helpers.Map;
 using SoapClientCallAssist.Readers;
 using System.Collections.Generic;
 using System.Xml.Linq;
@@ -30,13 +30,9 @@ using System.Xml.Linq;
 namespace SoapClientCallAssist.Mapping
 {
     /// <summary>
-    ///     The default <see cref="ISoapModelMapper" />. It holds no state, so a single instance can
+    ///     The default <see cref="ISoapModelMapper" />. It holds no state and a single instance can
     ///     be shared by every caller.
     /// </summary>
-    /// <seealso cref="T:SoapClientCallAssist.Abstractions.ISoapModelMapper"/>
-    /// <seealso cref="ISoapModelMapper">
-    ///     =================================================================================================
-    /// </seealso>
     public sealed class SoapModelMapper : ISoapModelMapper
     {
         /// <inheritdoc/>

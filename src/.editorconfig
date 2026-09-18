@@ -247,3 +247,10 @@ indent_style=space
 
 [Reference.cs]
 dotnet_diagnostic.cs1591.severity=silent
+
+# WS-Security wire goldens are single-line signer output; a formatter or whitespace clean-up changes what they pin
+[tests/**/TestData/WireGolden/*.wire]
+end_of_line = crlf
+insert_final_newline = true
+trim_trailing_whitespace = false
+indent_style = unset

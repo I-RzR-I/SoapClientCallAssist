@@ -29,13 +29,13 @@ using System.Linq;
 namespace SoapClientCallAssist.Extensions
 {
     /// <summary>
-    ///     A string extensions.
+    ///     String helpers for XML names, flag lists and message templates.
     /// </summary>
     internal static class StringExtensions
     {
         /// <summary>
-        ///     Removes the arity suffix from a generic CLR type name, so that a name such as
-        ///     <c>Wrapper`1</c> becomes a legal XML element name.
+        ///     Removes the arity suffix from a generic CLR type name; <c>Wrapper`1</c> becomes
+        ///     <c>Wrapper</c>.
         /// </summary>
         /// <param name="name">The CLR type name.</param>
         /// <returns>
@@ -49,9 +49,7 @@ namespace SoapClientCallAssist.Extensions
         }
 
         /// <summary>
-        ///     Returns the first value that carries content. An attribute property that was never
-        ///     assigned is null, which is how an unset name or namespace falls through to the next
-        ///     source.
+        ///     Returns the first value that carries content, or null when none does.
         /// </summary>
         /// <param name="values">The candidate values, in precedence order.</param>
         /// <returns>
@@ -76,9 +74,8 @@ namespace SoapClientCallAssist.Extensions
         }
 
         /// <summary>
-        ///     Rewrites a flag list into the single form <see cref="Enum.Parse(Type,string)" />
-        ///     understands. Both separators are accepted, so the XSD list form and the CLR form read the
-        ///     same way.
+        ///     Rewrites a space or comma separated flag list into the comma separated form
+        ///     <see cref="Enum.Parse(Type,string)" /> understands.
         /// </summary>
         /// <param name="value">The trimmed element text.</param>
         /// <returns>
@@ -95,7 +92,7 @@ namespace SoapClientCallAssist.Extensions
 
         /// <summary>
         ///     Formats a message template, falling back to the raw template when the arguments do not
-        ///     match its placeholders. Message construction must not be able to fail.
+        ///     match its placeholders.
         /// </summary>
         /// <param name="template">The message template.</param>
         /// <param name="args">The message arguments.</param>

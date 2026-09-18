@@ -4,9 +4,9 @@
 //  Created On        : 2026-08-31 13:08
 // 
 //  Last Modified By : RzR
-//  Last Modified On : 2026-08-31 20:42
+//  Last Modified On : 2026-09-04 22:44
 //  ***********************************************************************
-//  <copyright file="SoapValueKind.cs" company="RzR SOFT & TECH">
+//  <copyright file="SoapValueKindType.cs" company="RzR SOFT & TECH">
 //      Copyright (c) RzR. All rights reserved.
 //  </copyright>
 //  <contact>
@@ -20,7 +20,7 @@ namespace SoapClientCallAssist.Enums
     /// <summary>
     ///     Describes how the value of a mapped member is represented in XML.
     /// </summary>
-    internal enum SoapValueKind
+    internal enum SoapValueKindType
     {
         /// <summary>
         ///     A scalar value written as element text. Covers primitives, string and byte arrays.

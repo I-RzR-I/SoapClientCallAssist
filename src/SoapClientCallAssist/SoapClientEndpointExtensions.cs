@@ -4,7 +4,7 @@
 //  Created On        : 2024-09-12 19:03
 // 
 //  Last Modified By : RzR
-//  Last Modified On : 2026-08-31 20:42
+//  Last Modified On : 2026-09-12 09:30
 //  ***********************************************************************
 //  <copyright file="SoapClientEndpointExtensions.cs" company="RzR SOFT & TECH">
 //      Copyright (c) RzR. All rights reserved.
@@ -22,8 +22,11 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using SoapClientCallAssist.Abstractions;
 using SoapClientCallAssist.Client;
 using SoapClientCallAssist.Enums;
-using SoapClientCallAssist.Helper;
+using SoapClientCallAssist.Extensions;
+using SoapClientCallAssist.Helpers;
 using SoapClientCallAssist.Mapping;
+using SoapClientCallAssist.Security;
+using SoapClientCallAssist.Security.WsSecurity;
 using System;
 
 #endregion
@@ -31,23 +34,44 @@ using System;
 namespace SoapClientCallAssist
 {
     /// <summary>
-    ///     A SOAP client endpoint extensions.
+    ///     Registers the SOAP clients and their supporting services in a service collection.
     /// </summary>
     public static class SoapClientEndpointExtensions
     {
         /// <summary>
-        ///     An IServiceCollection extension method that registers the SOAP clients endpoint described
-        ///     by services.
+        ///     (Immutable)
+        ///     The name of the <see cref="System.Net.Http.HttpClient" /> configuration every SOAP client
+        ///     sends through. A caller adds a handler, proxy, certificate or retry policy by configuring
+        ///     this name.
         /// </summary>
-        /// <param name="services">The services to act on.</param>
+        public const string SoapHttpClientName = SoapHttpClientRegistration.ClientName;
+
+        /// <summary>
+        ///     (Immutable)
+        ///     The <see cref="System.Net.Http.HttpRequestMessage.Properties" /> key under which a
+        ///     request built with message security carries the single-use snapshot
+        ///     <see cref="ISoapResponseSecurity" /> checks the response against. The value is opaque and
+        ///     consumed by the first check.
+        /// </summary>
+        public const string RequestSecurityStateKey = "SoapClientCallAssist.RequestSecurityState";
+
+        /// <summary>
+        ///     Registers both SOAP clients as singletons behind a
+        ///     <c>Func&lt;SoapProtocolType, ISoapClientEndpoint&gt;</c>, with the named HTTP client, the
+        ///     model mapper and the WS-Security services.
+        /// </summary>
+        /// <param name="services">The service collection to register into.</param>
         public static void RegisterSoapClientsEndpoint(this IServiceCollection services)
         {
-            services.AddHttpClient();
+            SoapHttpClientRegistration.Register(services);
 
             services.AddSingleton<Soap11Client>();
             services.AddSingleton<Soap12Client>();
 
             services.TryAddSingleton<ISoapModelMapper, SoapModelMapper>();
+            services.TryAddSingleton<ISoapMessageVerifier, WsSecurityMessageVerifier>();
+            services.TryAddSingleton<ISoapResponseSecurity, WsSecurityResponseSecurity>();
+            services.TryAddSingleton<SoapSecureConversationClient>();
 
             services.AddSingleton<Func<SoapProtocolType, ISoapClientEndpoint>>(sp => endpointType =>
             {
@@ -56,7 +80,7 @@ namespace SoapClientCallAssist
                     SoapProtocolType.SOAP_1_1 => sp.GetRequiredService<Soap11Client>(),
                     SoapProtocolType.SOAP_1_2 => sp.GetRequiredService<Soap12Client>(),
                     _ => throw new NotImplementedException(
-                        string.Format(DefaultResultMessageHelper.ErrorMessages[MessageCodesType.ER_DI_RSCE_001]))
+                        DefaultResultMessageHelper.GetErrorMessage(MessageCodesType.ER_DI_RSCE_001).TryFormatWith(endpointType))
                 };
             });
         }

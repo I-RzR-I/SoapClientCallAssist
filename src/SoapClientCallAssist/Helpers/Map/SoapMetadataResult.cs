@@ -23,23 +23,22 @@ using RzR.ResultMessage.Abstractions;
 using SoapClientCallAssist.Dto.Map;
 using SoapClientCallAssist.Extensions;
 using System;
-using Failures = SoapClientCallAssist.Helper.Map.SoapMappingFailure;
+using Failures = SoapClientCallAssist.Helpers.Map.SoapMappingFailure;
 using MessageCodes = SoapClientCallAssist.Enums.MessageCodesType;
-using Messages = SoapClientCallAssist.Helper.DefaultResultMessageHelper;
+using Messages = SoapClientCallAssist.Helpers.DefaultResultMessageHelper;
 
 #endregion
 
-namespace SoapClientCallAssist.Helper.Map
+namespace SoapClientCallAssist.Helpers.Map
 {
     /// <summary>
-    ///     Builds the <see cref="IResult{T}" /> values returned by the mapping metadata pipeline.
-    ///     Every member is total and never throws, so a caller can rely on a result instead of an
-    ///     exception.
+    ///     Builds the <see cref="IResult{T}" /> values the mapping metadata pipeline returns. No member
+    ///     throws.
     /// </summary>
     internal static class SoapMetadataResult
     {
         /// <summary>
-        ///     A successfully resolved type map.
+        ///     Builds the success result carrying a resolved type map.
         /// </summary>
         /// <param name="map">The resolved map.</param>
         /// <returns>
@@ -49,96 +48,92 @@ namespace SoapClientCallAssist.Helper.Map
             => Result<SoapTypeMap>.Success(map);
 
         /// <summary>
-        ///     The type declares neither a [SoapMember] nor a [DataMember] member. Properties are never
-        ///     mapped implicitly, so this is a failure rather than an empty map.
+        ///     Builds the failure for a type that declares neither a [SoapMember] nor a [DataMember]
+        ///     member.
         /// </summary>
         /// <param name="typeName">Name of the type.</param>
         /// <returns>
-        ///     A failed IResult&lt;SoapTypeMap&gt;.
+        ///     The failure for a type with no mapped members.
         /// </returns>
         internal static IResult<SoapTypeMap> NoMappedMembers(string typeName)
             => Validation(MessageCodes.V_MAP_001, typeName);
 
         /// <summary>
-        ///     The declared CLR type of member cannot be represented in XML.
+        ///     Builds the failure for a member whose declared CLR type cannot be represented in XML.
         /// </summary>
         /// <param name="memberTypeName">Name of the unsupported member type.</param>
         /// <param name="memberName">Name of the member.</param>
         /// <returns>
-        ///     A failed IResult&lt;SoapTypeMap&gt;.
+        ///     The failure for an unsupported member type.
         /// </returns>
         internal static IResult<SoapTypeMap> UnsupportedMemberType(string memberTypeName, string memberName)
             => Validation(MessageCodes.V_MAP_002, memberTypeName, memberName);
 
         /// <summary>
-        ///     A mapped member exposes no public setter, so the response reader has nowhere to put the
-        ///     value it binds. The member is reported rather than dropped, because a silently dropped
-        ///     member reads back as an all defaults value on a successful result.
+        ///     Builds the failure for a mapped member that exposes no public setter for the response
+        ///     reader to bind into.
         /// </summary>
         /// <param name="memberTypeName">Name of the member type.</param>
         /// <param name="memberName">Name of the member.</param>
         /// <returns>
-        ///     A failed IResult&lt;SoapTypeMap&gt;.
+        ///     The failure for a member that cannot be set.
         /// </returns>
         internal static IResult<SoapTypeMap> NotSettableMember(string memberTypeName, string memberName)
             => Validation(MessageCodes.V_MAP_002, memberTypeName, memberName);
 
         /// <summary>
-        ///     Two members of the same type resolve to the same namespace, local name and binding path.
+        ///     Builds the failure for two members of one type that resolve to the same namespace, local
+        ///     name and binding path.
         /// </summary>
         /// <param name="wireName">The duplicated wire name.</param>
         /// <param name="typeName">Name of the declaring type.</param>
         /// <returns>
-        ///     A failed IResult&lt;SoapTypeMap&gt;.
+        ///     The failure for a duplicated wire name.
         /// </returns>
         internal static IResult<SoapTypeMap> DuplicateWireName(string wireName, string typeName)
             => Validation(MessageCodes.V_MAP_003, wireName, typeName);
 
         /// <summary>
-        ///     A type resolves to an element in no namespace: it declares no namespace of its own and
-        ///     the call site offers none to inherit. An unqualified element triggers the destructive
-        ///     body rebuild in the SOAP XML helper, so it is rejected here, at the one place a namespace
-        ///     is resolved from. Every member name is then built on the namespace this check has already
-        ///     accepted, which is why no second, per member check is needed.
+        ///     Builds the failure for a type that declares no namespace of its own and inherits none from
+        ///     the call site.
         /// </summary>
-        /// <param name="memberName">
-        ///     Name of the type or request member that resolved to no namespace.
-        /// </param>
+        /// <param name="memberName">Name of the type or member that resolved to no namespace.</param>
         /// <returns>
-        ///     A failed IResult&lt;SoapTypeMap&gt;.
+        ///     The failure for a missing namespace.
         /// </returns>
         internal static IResult<SoapTypeMap> MissingNamespace(string memberName)
             => Validation(MessageCodes.V_MAP_004, memberName);
 
         /// <summary>
-        ///     The type decorates some members with [SoapMember] and others with [DataMember].
+        ///     Builds the failure for a type that decorates some members with [SoapMember] and others with
+        ///     [DataMember].
         /// </summary>
         /// <param name="typeName">Name of the type.</param>
         /// <returns>
-        ///     A failed IResult&lt;SoapTypeMap&gt;.
+        ///     The failure for mixed member conventions.
         /// </returns>
         internal static IResult<SoapTypeMap> MixedConventions(string typeName)
             => Validation(MessageCodes.V_MAP_006, typeName);
 
         /// <summary>
-        ///     A walk of the type graph passed the supported nesting depth, which is how a recursive
-        ///     graph is stopped instead of overflowing the stack.
+        ///     Builds the failure for a type graph walk that passed the supported nesting depth.
         /// </summary>
         /// <param name="typeName">Name of the type being resolved when the cap was reached.</param>
         /// <param name="maxDepth">The maximum supported depth.</param>
         /// <returns>
-        ///     A failed IResult&lt;SoapTypeMap&gt;.
+        ///     The failure for a type graph nested too deep.
         /// </returns>
         internal static IResult<SoapTypeMap> DepthExceeded(string typeName, int maxDepth)
             => Validation(MessageCodes.V_MAP_007, typeName, maxDepth);
 
         /// <summary>
-        ///     An unexpected error, typically raised by reflection, while reading mapping metadata.
+        ///     Builds the failure for an unexpected exception, typically from reflection, while reading
+        ///     mapping metadata.
         /// </summary>
         /// <param name="typeName">Name of the type being read.</param>
         /// <param name="exception">The captured exception.</param>
         /// <returns>
-        ///     A failed IResult&lt;SoapTypeMap&gt;.
+        ///     The failure for a metadata read error, carrying the exception.
         /// </returns>
         internal static IResult<SoapTypeMap> ReadError(string typeName, Exception exception)
             => Result<SoapTypeMap>.Failure(

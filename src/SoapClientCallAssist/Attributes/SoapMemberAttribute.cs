@@ -27,19 +27,14 @@ namespace SoapClientCallAssist.Attributes
     ///     Maps a property to a SOAP element. The wire name is frequently different from the CLR
     ///     property name, so <see cref="Name" /> is the authoritative element name.
     /// </summary>
-    /// <seealso cref="Attribute">
-    ///     =================================================================================================
-    /// </seealso>
     [AttributeUsage(AttributeTargets.Property)]
     public sealed class SoapMemberAttribute : Attribute
     {
         /// <summary>
-        ///     Gets or sets the wire name of the element, which is often different from the CLR property
-        ///     name (for example <c>product</c> or <c>associatedLocationIds</c>). When <see langword="null" />
-        ///     , the property name is used.
+        ///     The wire name of the element. When <see langword="null" />, the property name is used.
         /// </summary>
         /// <value>
-        ///     The element local name on the wire, or <see langword="null" /> to use the property name.
+        ///     The name.
         /// </value>
         public string Name { get; set; }
 
@@ -48,37 +43,36 @@ namespace SoapClientCallAssist.Attributes
         ///     namespace of the declaring type is inherited.
         /// </summary>
         /// <value>
-        ///     The XML namespace, or <see langword="null" /> to inherit from the declaring type.
+        ///     The namespace.
         /// </value>
         public string Namespace { get; set; }
 
         /// <summary>
-        ///     Gets or sets the emit/serialization order of this member. Lower values are emitted first.
-        ///     The default of <c>-1</c> means unspecified.
+        ///     The emit order of this member, lower values first. The default of <c>-1</c> means
+        ///     unspecified.
         /// </summary>
         /// <value>
-        ///     The order, or <c>-1</c> when unspecified.
+        ///     The order.
         /// </value>
         public int Order { get; set; } = -1;
 
         /// <summary>
-        ///     Gets or sets a slash separated chain of element local names used to locate this member
-        ///     when binding a response, for example <c>ReceivedProduct/Detail</c>. This is not an XPath
-        ///     expression; each segment is compared as a local name. When <see langword="null" />, the
-        ///     member is bound directly by <see cref="Name" />.
+        ///     A slash separated chain of element local names (<c>ReceivedProduct/Detail</c>) that
+        ///     locates this member when binding a response. It is not an XPath expression, and
+        ///     <see langword="null" /> binds directly by <see cref="Name" />.
         /// </summary>
         /// <value>
-        ///     The slash separated local name chain, or <see langword="null" /> to bind by name.
+        ///     The full pathname of the file.
         /// </value>
         public string Path { get; set; }
 
         /// <summary>
-        ///     Gets or sets the element name emitted for each item of a collection member, for example
-        ///     <c>int</c> so that a list emits <c>&lt;ids&gt;&lt;int&gt;1&lt;/int&gt;&lt;/ids&gt;</c>.
-        ///     When <see langword="null" />, the contract name of the item type is used.
+        ///     The element name emitted for each item of a collection member; <c>int</c> emits
+        ///     <c>&lt;ids&gt;&lt;int&gt;1&lt;/int&gt;&lt;/ids&gt;</c>. When
+        ///     <see langword="null" />, the contract name of the item type is used.
         /// </summary>
         /// <value>
-        ///     The per item element name, or <see langword="null" /> to use the item contract name.
+        ///     The name of the item.
         /// </value>
         public string ItemName { get; set; }
     }

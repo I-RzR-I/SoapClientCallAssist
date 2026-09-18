@@ -4,7 +4,7 @@
 //  Created On        : 2026-08-31 15:08
 // 
 //  Last Modified By : RzR
-//  Last Modified On : 2026-08-31 20:42
+//  Last Modified On : 2026-09-04 22:44
 //  ***********************************************************************
 //  <copyright file="SoapModelEmitter.cs" company="RzR SOFT & TECH">
 //      Copyright (c) RzR. All rights reserved.
@@ -29,34 +29,26 @@ using System.Collections.Generic;
 using System.Xml;
 using System.Xml.Linq;
 using EmitResult = RzR.ResultMessage.Abstractions.IResult<System.Collections.Generic.IEnumerable<System.Xml.Linq.XElement>>;
-using Failures = SoapClientCallAssist.Helper.Map.SoapMappingFailure;
+using Failures = SoapClientCallAssist.Helpers.Map.SoapMappingFailure;
 using MessageCodes = SoapClientCallAssist.Enums.MessageCodesType;
-using Messages = SoapClientCallAssist.Helper.DefaultResultMessageHelper;
+using Messages = SoapClientCallAssist.Helpers.DefaultResultMessageHelper;
 
 #endregion
 
-namespace SoapClientCallAssist.Helper.Map
+namespace SoapClientCallAssist.Helpers.Map
 {
     /// <summary>
     ///     Emits the document/literal wrapped SOAP body of an operation call from decorated models.
-    ///     Every element is built with <see cref="XElement" /> and placed in a not empty default
-    ///     namespace: an unqualified or prefixed element is silently flattened to concatenated text
-    ///     by the body rebuild in <see cref="SoapXmlHelper" />. Qualification is established where a
-    ///     namespace is resolved rather than checked again afterwards; the operation namespace is
-    ///     validated in <see cref="Validate" /> and every other name is built on a type namespace
-    ///     the metadata read has already accepted as not empty.
     /// </summary>
     internal static class SoapModelEmitter
     {
         /// <summary>
-        ///     (Immutable) the name reported for a failure that belongs to the request itself rather
-        ///     than to one of its members.
+        ///     The member name reported for a failure that belongs to the request itself.
         /// </summary>
         private const string RequestOwner = "(request)";
 
         /// <summary>
-        ///     (Immutable) the element name emitted per item of a collection of simple values, matching
-        ///     the schema type name a service publishes for that CLR type.
+        ///     The schema type name emitted as the item element name for each simple CLR type.
         /// </summary>
         private static readonly Dictionary<Type, string> SimpleItemNames = new()
         {
@@ -116,10 +108,6 @@ namespace SoapClientCallAssist.Helper.Map
                         root.Add(child);
                 }
 
-                // Every element name emitted below is built on a namespace that has already been
-                // accepted as non empty, either by Validate or by the metadata read, and no attribute is
-                // ever added, so the tree cannot carry the unqualified or prefix declaring element that
-                // the body rebuild in SoapXmlHelper would flatten.
                 return Result<IEnumerable<XElement>>.Success(new[] { root });
             }
             catch (Exception ex)
@@ -152,9 +140,8 @@ namespace SoapClientCallAssist.Helper.Map
         }
 
         /// <summary>
-        ///     Emits one argument of the operation. The parameter element itself belongs to the
-        ///     operation namespace, which is what a document/literal wrapped service declares for it.
-        /// 
+        ///     Emits one argument of the operation as an element in the operation namespace. A null
+        ///     argument is omitted.
         /// </summary>
         /// <param name="parameter">The argument to emit.</param>
         /// <param name="operationNamespace">The namespace of the operation element.</param>
@@ -165,8 +152,7 @@ namespace SoapClientCallAssist.Helper.Map
         /// <returns>
         ///     True when the argument was emitted or deliberately omitted.
         /// </returns>
-        private static bool TryEmitParameter(
-            SoapOperationParameter parameter, XNamespace operationNamespace,
+        private static bool TryEmitParameter(SoapOperationParameter parameter, XNamespace operationNamespace,
             out XElement element, out EmitResult failure)
         {
             element = null;
@@ -196,8 +182,6 @@ namespace SoapClientCallAssist.Helper.Map
                     return true;
                 }
 
-                // The declared item type of an argument is unknown, so each item is classified from its
-                // own runtime type.
                 return value is IEnumerable sequence
                     ? TryEmitCollection(sequence, name, null, null, 0, out element, out failure)
                     : TryEmitComplex(value, valueType, name, 0, out element, out failure);
@@ -214,9 +198,7 @@ namespace SoapClientCallAssist.Helper.Map
         ///     Emits a complex value as an element carrying one child per mapped member.
         /// </summary>
         /// <param name="value">The value to emit.</param>
-        /// <param name="declaredType">
-        ///     The declared CLR type, which is what the contract is read from.
-        /// </param>
+        /// <param name="declaredType">The declared CLR type the contract is read from.</param>
         /// <param name="elementName">The name of the emitted element.</param>
         /// <param name="depth">The current depth of the type graph walk.</param>
         /// <param name="element">[out] The emitted element.</param>
@@ -224,8 +206,7 @@ namespace SoapClientCallAssist.Helper.Map
         /// <returns>
         ///     True when the value was emitted.
         /// </returns>
-        private static bool TryEmitComplex(
-            object value, Type declaredType, XName elementName, int depth,
+        private static bool TryEmitComplex(object value, Type declaredType, XName elementName, int depth,
             out XElement element, out EmitResult failure)
         {
             element = null;
@@ -246,8 +227,7 @@ namespace SoapClientCallAssist.Helper.Map
         /// <returns>
         ///     True when the value was emitted.
         /// </returns>
-        private static bool TryEmitMapped(
-            object value, SoapTypeMap map, XName elementName, int depth,
+        private static bool TryEmitMapped(object value, SoapTypeMap map, XName elementName, int depth,
             out XElement element, out EmitResult failure)
         {
             element = null;
@@ -269,8 +249,8 @@ namespace SoapClientCallAssist.Helper.Map
         }
 
         /// <summary>
-        ///     Emits one mapped member of a complex value. A null member is omitted rather than written
-        ///     as a nil element.
+        ///     Emits one mapped member of a complex value. A null member is omitted, not written as a
+        ///     nil element.
         /// </summary>
         /// <param name="owner">The instance the member is read from.</param>
         /// <param name="member">The member to emit.</param>
@@ -280,8 +260,7 @@ namespace SoapClientCallAssist.Helper.Map
         /// <returns>
         ///     True when the member was emitted or deliberately omitted.
         /// </returns>
-        private static bool TryEmitMember(
-            object owner, SoapMemberMap member, int depth,
+        private static bool TryEmitMember(object owner, SoapMemberMap member, int depth,
             out XElement element, out EmitResult failure)
         {
             element = null;
@@ -302,18 +281,16 @@ namespace SoapClientCallAssist.Helper.Map
             if (value.IsNull())
                 return true;
 
-            if (member.Kind == SoapValueKind.Collection)
+            if (member.Kind == SoapValueKindType.Collection)
             {
                 return TryEmitCollection(
                     (IEnumerable)value, member.WireName, member.ItemName,
                     member.CollectionItemType, depth, out element, out failure);
             }
 
-            if (member.Kind == SoapValueKind.Complex)
+            if (member.Kind == SoapValueKindType.Complex)
                 return TryEmitComplex(value, member.MemberType, member.WireName, depth, out element, out failure);
 
-            // A nullable member arrives boxed as its underlying value, so the runtime type is what decides
-            // the text format.
             var valueType = value.GetType();
             if (TryFormat(value, valueType, out var text).IsFalse())
             {
@@ -328,11 +305,9 @@ namespace SoapClientCallAssist.Helper.Map
         }
 
         /// <summary>
-        ///     Emits a sequence as a wrapper element with one child per item. Every item is qualified
-        ///     with the namespace of the wrapper, or with its own contract namespace when it declares
-        ///     one; an unqualified item would make the whole wrapper eligible for the destructive body
-        ///     rebuild. An empty sequence is omitted, as is a null item, since a nil element is not
-        ///     emitted.
+        ///     Emits a sequence as a wrapper element with one child per item, each qualified with the
+        ///     wrapper's or its own contract namespace. Null items and an empty sequence are omitted.
+        /// 
         /// </summary>
         /// <param name="values">The items to emit.</param>
         /// <param name="wrapperName">The name of the wrapper element.</param>
@@ -344,8 +319,8 @@ namespace SoapClientCallAssist.Helper.Map
         /// <returns>
         ///     True when the sequence was emitted or deliberately omitted.
         /// </returns>
-        private static bool TryEmitCollection(
-            IEnumerable values, XName wrapperName, string itemName, Type declaredItemType, int depth,
+        private static bool TryEmitCollection(IEnumerable values, XName wrapperName, string itemName, 
+            Type declaredItemType, int depth,
             out XElement element, out EmitResult failure)
         {
             element = null;
@@ -408,8 +383,7 @@ namespace SoapClientCallAssist.Helper.Map
         /// <returns>
         ///     True when the map was resolved.
         /// </returns>
-        private static bool TryResolveMap(
-            Type clrType, XNamespace inheritedNamespace, int depth,
+        private static bool TryResolveMap(Type clrType, XNamespace inheritedNamespace, int depth,
             out SoapTypeMap map, out EmitResult failure)
         {
             map = null;
@@ -417,8 +391,6 @@ namespace SoapClientCallAssist.Helper.Map
             var resolved = SoapTypeMapCache.GetMap(clrType, inheritedNamespace.NamespaceName, depth);
             if (resolved.IsSuccess.IsFalse())
             {
-                // Every message the metadata read produced is carried over, so a caller is told exactly
-                // which contract rule the type broke rather than only the first line of it.
                 failure = resolved.Propagate<IEnumerable<XElement>>();
 
                 return false;
@@ -441,8 +413,7 @@ namespace SoapClientCallAssist.Helper.Map
             => SimpleItemNames.TryGetValue(type, out var name) ? name : type.Name;
 
         /// <summary>
-        ///     Formats a simple value as element text. Every conversion is culture invariant, so a
-        ///     caller running under any culture writes the same bytes on the wire.
+        ///     Formats a simple value as element text with culture-invariant conversions.
         /// </summary>
         /// <param name="value">The value to format.</param>
         /// <param name="type">The runtime type of the value.</param>
@@ -521,9 +492,8 @@ namespace SoapClientCallAssist.Helper.Map
         }
 
         /// <summary>
-        ///     Formats an enum by member name. A flags value is written as the space separated list a
-        ///     schema declares for it; a value that resolves to no name at all is refused rather than
-        ///     written as a number the service would not recognise.
+        ///     Formats an enum by member name, writing a flags value as a space separated list of names.
+        ///     A value that resolves to no name is refused.
         /// </summary>
         /// <param name="value">The value to format.</param>
         /// <param name="type">The enum type.</param>
@@ -550,14 +520,13 @@ namespace SoapClientCallAssist.Helper.Map
         }
 
         /// <summary>
-        ///     Builds an emit failure naming the member and the type it belongs to. No member value is
-        ///     ever placed in a message, since a value may carry a secret.
+        ///     Builds an emit failure naming the member and its declaring type, never the member's value.
         /// </summary>
         /// <param name="memberName">Name of the member being emitted.</param>
         /// <param name="typeName">Name of the type declaring the member.</param>
         /// <param name="exception">The captured exception, or null when there is none.</param>
         /// <returns>
-        ///     A failed IResult&lt;IEnumerable&lt;XElement&gt;&gt;.
+        ///     The failure for a member that could not be emitted.
         /// </returns>
         private static EmitResult EmitError(string memberName, string typeName, Exception exception)
             => Result<IEnumerable<XElement>>.Failure(

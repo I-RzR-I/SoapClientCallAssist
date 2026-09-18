@@ -4,7 +4,7 @@
 //  Created On        : 2026-08-31 13:08
 // 
 //  Last Modified By : RzR
-//  Last Modified On : 2026-08-31 20:42
+//  Last Modified On : 2026-09-04 22:44
 //  ***********************************************************************
 //  <copyright file="SoapMetadataReader.cs" company="RzR SOFT & TECH">
 //      Copyright (c) RzR. All rights reserved.
@@ -24,7 +24,7 @@ using SoapClientCallAssist.Attributes;
 using SoapClientCallAssist.Dto.Map;
 using SoapClientCallAssist.Enums;
 using SoapClientCallAssist.Extensions;
-using SoapClientCallAssist.Helper.Map;
+using SoapClientCallAssist.Helpers.Map;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -38,22 +38,18 @@ using System.Xml.Linq;
 namespace SoapClientCallAssist.Readers
 {
     /// <summary>
-    ///     Reads the SOAP mapping metadata of a CLR type into an immutable <see cref="SoapTypeMap" />
-    ///     . Nested complex members are recorded by type only, never resolved here, so building one
-    ///     map can never recurse into a cyclic type graph.
+    ///     Reads the SOAP mapping metadata of a CLR type into an immutable <see cref="SoapTypeMap" />.
     /// </summary>
     internal static class SoapMetadataReader
     {
         /// <summary>
-        ///     Reads the mapping metadata of the supplied type. This method never throws; every failure
-        ///     is returned as a failed result.
+        ///     Reads the mapping metadata of the supplied type.
         /// </summary>
         /// <param name="clrType">The type to read.</param>
-        /// <param name="inheritedNamespace">
-        ///     The call site namespace inherited by a type that declares none of its own.
-        /// </param>
+        /// <param name="inheritedNamespace">The namespace a type inherits when it declares none.</param>
         /// <returns>
-        ///     An IResult&lt;SoapTypeMap&gt;.
+        ///     The type map, or a failure naming the missing namespace, mixed conventions, unmapped or
+        ///     unsupported members, a duplicate wire name or a read error.
         /// </returns>
         internal static IResult<SoapTypeMap> Read(Type clrType, string inheritedNamespace)
         {
@@ -73,7 +69,7 @@ namespace SoapClientCallAssist.Readers
 
                 var typeNamespace = new[]
                 {
-                    declaredNamespace, 
+                    declaredNamespace,
                     inheritedNamespace
                 }.FirstPresent();
 
@@ -149,12 +145,11 @@ namespace SoapClientCallAssist.Readers
         /// <param name="property">The property to map.</param>
         /// <param name="typeNamespace">The resolved namespace of the declaring type.</param>
         /// <param name="soapMemberMode">True when the declaring type is in [SoapMember] mode.</param>
-        /// <param name="failure">[out] The failure to return when the result is null.</param>
+        /// <param name="failure">The failure to return when the result is null.</param>
         /// <returns>
         ///     The member map, or null when <paramref name="failure" /> is set.
         /// </returns>
-        private static SoapMemberMap BuildMember(
-            PropertyInfo property, string typeNamespace,
+        private static SoapMemberMap BuildMember(PropertyInfo property, string typeNamespace,
             bool soapMemberMode, out IResult<SoapTypeMap> failure)
         {
             failure = null;
@@ -169,9 +164,18 @@ namespace SoapClientCallAssist.Readers
             var soapMember = soapMemberMode ? property.GetCustomAttribute<SoapMemberAttribute>(true) : null;
             var dataMember = soapMemberMode ? null : property.GetCustomAttribute<DataMemberAttribute>(true);
 
-            var localName = new[] { soapMember.IsNull() ? null : soapMember!.Name, dataMember.IsNull() ? null : dataMember!.Name, property.Name }.FirstPresent();
+            var localName = new[]
+            {
+                soapMember.IsNull() ? null : soapMember!.Name,
+                dataMember.IsNull() ? null : dataMember!.Name,
+                property.Name
+            }.FirstPresent();
 
-            var memberNamespace = new[] { soapMember.IsNull() ? null : soapMember!.Namespace, typeNamespace }.FirstPresent();
+            var memberNamespace = new[]
+            {
+                soapMember.IsNull() ? null : soapMember!.Namespace,
+                typeNamespace
+            }.FirstPresent();
 
             var order = soapMember.IsNotNull()
                 ? soapMember!.Order
@@ -186,20 +190,14 @@ namespace SoapClientCallAssist.Readers
                 return null;
             }
 
-            return new SoapMemberMap(
-                property,
-                XNamespace.Get(memberNamespace).GetName(localName),
-                order,
-                SplitPath(soapMember.IsNull() ? null : soapMember!.Path),
+            return new SoapMemberMap(property, XNamespace.Get(memberNamespace).GetName(localName),
+                order, SplitPath(soapMember.IsNull() ? null : soapMember!.Path),
                 soapMember.IsNull() ? null : soapMember!.ItemName,
-                property.PropertyType,
-                itemType,
-                kind);
+                property.PropertyType, itemType, kind);
         }
 
         /// <summary>
-        ///     Counts how far the type declaring a member sits from the root of its hierarchy, which is
-        ///     what puts a base declared member ahead of a derived one.
+        ///     Counts how far the type declaring a member sits from the root of its hierarchy.
         /// </summary>
         /// <param name="member">The member to measure.</param>
         /// <returns>
@@ -220,10 +218,7 @@ namespace SoapClientCallAssist.Readers
 
         /// <summary>
         ///     Enumerates the properties eligible for mapping: public instance properties, declared or
-        ///     inherited, that expose a public getter and take no index parameters. A missing public
-        ///     setter does not disqualify a property here; a decorated property that cannot be written
-        ///     is reported by <see cref="BuildMember" /> rather than dropped, because dropping it would
-        ///     leave a declared member silently unbound.
+        ///     inherited, that expose a public getter and take no index parameters.
         /// </summary>
         /// <param name="clrType">The type to inspect.</param>
         /// <returns>
@@ -261,15 +256,15 @@ namespace SoapClientCallAssist.Readers
         ///     the strength of its shape alone; its own map is resolved later, on demand.
         /// </summary>
         /// <param name="memberType">The declared member type.</param>
-        /// <param name="itemType">[out] The collection item type, or null.</param>
-        /// <param name="kind">[out] The resolved value kind.</param>
+        /// <param name="itemType">The collection item type, or null.</param>
+        /// <param name="kind">The resolved value kind.</param>
         /// <returns>
         ///     True when the type is supported.
         /// </returns>
-        private static bool TryResolveKind(Type memberType, out Type itemType, out SoapValueKind kind)
+        private static bool TryResolveKind(Type memberType, out Type itemType, out SoapValueKindType kind)
         {
             itemType = null;
-            kind = SoapValueKind.Simple;
+            kind = SoapValueKindType.Simple;
 
             if (memberType.IsNull())
                 return false;
@@ -292,11 +287,11 @@ namespace SoapClientCallAssist.Readers
             if (item.IsNotNull())
             {
                 if (TryResolveKind(item, out _, out var itemKind).IsFalse()
-                    || itemKind == SoapValueKind.Collection)
+                    || itemKind == SoapValueKindType.Collection)
                     return false;
 
                 itemType = item;
-                kind = SoapValueKind.Collection;
+                kind = SoapValueKindType.Collection;
 
                 return true;
             }
@@ -307,20 +302,16 @@ namespace SoapClientCallAssist.Readers
             if (memberType.IsInterface)
                 return false;
 
-            kind = SoapValueKind.Complex;
+            kind = SoapValueKindType.Complex;
 
             return true;
         }
 
         /// <summary>
-        ///     Resolves the item type of a generic sequence. A type reaching this point is already known
-        ///     not to be a string or a byte array, both of which are simple values rather than sequences.
-        /// 
+        ///     Resolves the item type of a single-rank array or a generic sequence.
         /// </summary>
         /// <param name="type">The type to inspect.</param>
-        /// <param name="ambiguous">
-        ///     [in,out] Set to true when the type offers more than one usable item type.
-        /// </param>
+        /// <param name="ambiguous">Set to true when the type offers more than one usable item type.</param>
         /// <returns>
         ///     The item type, or null when the type is not a generic sequence.
         /// </returns>

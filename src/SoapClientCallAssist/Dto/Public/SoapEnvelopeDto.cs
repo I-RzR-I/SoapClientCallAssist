@@ -26,38 +26,29 @@ using System.Xml.Linq;
 namespace SoapClientCallAssist.Dto.Public
 {
     /// <summary>
-    ///     A SOAP envelope data transfer object.
+    ///     The content of a SOAP envelope, made of the Body elements, the Header elements, the action
+    ///     and any extra Envelope attributes.
     /// </summary>
     public class SoapEnvelopeDto
     {
         /// <summary>
         ///     Initializes a new instance of the <see cref="SoapEnvelopeDto" /> class.
         /// </summary>
-        public SoapEnvelopeDto()
-        {
-        }
+        public SoapEnvelopeDto() { }
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="SoapEnvelopeDto" /> class.
         /// </summary>
-        /// <param name="bodies">The bodies.</param>
+        /// <param name="bodies">The elements placed inside the SOAP Body.</param>
         /// <param name="headers">
-        ///     (Optional)
-        ///     The headers.
+        ///     (Optional) The elements placed inside the SOAP Header, or null for none.
         /// </param>
-        /// <param name="action">
-        ///     (Optional)
-        ///     The action.
-        /// </param>
+        /// <param name="action">(Optional) The SOAP action, or null to send none.</param>
         /// <param name="ownSoapEnvelopeAttributes">
-        ///     (Optional)
-        ///     The own SOAP envelope attributes.
+        ///     (Optional) Extra Envelope attributes, or null for none.
         /// </param>
-        public SoapEnvelopeDto(
-            IEnumerable<XElement> bodies,
-            IEnumerable<XElement> headers = null,
-            string action = null,
-            IEnumerable<XAttribute> ownSoapEnvelopeAttributes = null)
+        public SoapEnvelopeDto(IEnumerable<XElement> bodies, IEnumerable<XElement> headers = null,
+            string action = null, IEnumerable<XAttribute> ownSoapEnvelopeAttributes = null)
         {
             Action = action;
             Bodies = bodies;
@@ -66,35 +57,24 @@ namespace SoapClientCallAssist.Dto.Public
         }
 
         /// <summary>
-        ///     Gets or sets the action.
+        ///     The SOAP action, sent as the <c>SOAPAction</c> and <c>Action</c> HTTP headers and as an
+        ///     <c>Action</c> header element; <see langword="null" /> sends none.
         /// </summary>
-        /// <value>
-        ///     The action.
-        /// </value>
         public string Action { get; set; }
 
         /// <summary>
-        ///     Gets or sets the bodies.
+        ///     The elements placed inside the SOAP Body.
         /// </summary>
-        /// <value>
-        ///     The bodies.
-        /// </value>
         public IEnumerable<XElement> Bodies { get; set; }
 
         /// <summary>
-        ///     Gets or sets the headers.
+        ///     The elements placed inside the SOAP Header.
         /// </summary>
-        /// <value>
-        ///     The headers.
-        /// </value>
         public IEnumerable<XElement> Headers { get; set; }
 
         /// <summary>
-        ///     Gets or sets the own SOAP envelope attributes.
+        ///     Extra attributes added to the Envelope element beside the protocol namespace declaration.
         /// </summary>
-        /// <value>
-        ///     The own SOAP envelope attributes.
-        /// </value>
         public IEnumerable<XAttribute> OwnSoapEnvelopeAttributes { get; set; }
     }
 }

@@ -4,7 +4,7 @@
 //  Created On        : 2026-08-31 13:08
 // 
 //  Last Modified By : RzR
-//  Last Modified On : 2026-08-31 20:42
+//  Last Modified On : 2026-09-04 22:44
 //  ***********************************************************************
 //  <copyright file="ISoapModelMapper.cs" company="RzR SOFT & TECH">
 //      Copyright (c) RzR. All rights reserved.
@@ -27,7 +27,8 @@ using System.Xml.Linq;
 namespace SoapClientCallAssist.Abstractions
 {
     /// <summary>
-    ///     Interface for SOAP model mapper.
+    ///     Builds SOAP bodies from a decorated model and binds a response back onto one. Requests
+    ///     built this way are sent as HTTP POST only.
     /// </summary>
     public interface ISoapModelMapper
     {
@@ -46,18 +47,14 @@ namespace SoapClientCallAssist.Abstractions
         ///     returned as a failed result.
         /// </summary>
         /// <typeparam name="T">
-        ///     The decorated model to bind. It must expose a public parameterless constructor.
+        ///     The decorated model; needs a public parameterless constructor.
         /// </typeparam>
         /// <param name="soapResponse">The raw response envelope.</param>
         /// <param name="protocolNamespace">
-        ///     The expected envelope namespace. Both SOAP 1.1 and SOAP 1.2 are recognised regardless of
-        ///     what is passed, and <see langword="null" /> is accepted.
+        ///     The namespace hint, or null; either protocol is accepted.
         /// </param>
         /// <param name="soapXmlBodyTag">
-        ///     (Optional)
-        ///     The body element name, with or without a prefix, or <see langword="null" /> to locate the
-        ///     body by SOAP namespace. This is the same tag the client endpoint accepts when it extracts
-        ///     a response body.
+        ///     (Optional) The Body tag, prefix optional, or <see langword="null" />.
         /// </param>
         /// <returns>
         ///     An IResult&lt;T&gt; carrying the bound instance.

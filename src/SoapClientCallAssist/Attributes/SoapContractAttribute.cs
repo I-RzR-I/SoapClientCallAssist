@@ -26,9 +26,6 @@ namespace SoapClientCallAssist.Attributes
     /// <summary>
     ///     Marks a CLR type as a SOAP contract and customizes the XML element that represents it.
     /// </summary>
-    /// <seealso cref="Attribute">
-    ///     =================================================================================================
-    /// </seealso>
     [AttributeUsage(AttributeTargets.Class)]
     public sealed class SoapContractAttribute : Attribute
     {
@@ -37,16 +34,16 @@ namespace SoapClientCallAssist.Attributes
         ///     the CLR type name is used.
         /// </summary>
         /// <value>
-        ///     The element local name, or <see langword="null" /> to use the CLR type name.
+        ///     The name.
         /// </value>
         public string Name { get; set; }
 
         /// <summary>
-        ///     Gets or sets the XML namespace used for this type and, by default, for its members. When <see langword="null" />
-        ///     , the namespace supplied by the call site is inherited.
+        ///     The XML namespace of this type and, by default, of its members. When
+        ///     <see langword="null" />, the namespace supplied by the call site is inherited.
         /// </summary>
         /// <value>
-        ///     The XML namespace, or <see langword="null" /> to inherit from the call site.
+        ///     The namespace.
         /// </value>
         public string Namespace { get; set; }
     }

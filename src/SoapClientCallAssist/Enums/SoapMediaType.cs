@@ -24,18 +24,20 @@ using System.ComponentModel;
 namespace SoapClientCallAssist.Enums
 {
     /// <summary>
-    ///     Values that represent SOAP media types.
+    ///     The HTTP media types of a SOAP request body, one per protocol version.
     /// </summary>
     internal enum SoapMediaType
     {
         /// <summary>
-        ///     An enum constant representing the SOAP 1.1 option.
+        ///     The SOAP 1.1 media type, <c>text/xml</c>.
         /// </summary>
-        [Description("text/xml")] Soap11,
+        [Description("text/xml")] 
+        Soap11,
 
         /// <summary>
-        ///     An enum constant representing the SOAP 1.2 option.
+        ///     The SOAP 1.2 media type, <c>application/soap+xml</c>.
         /// </summary>
-        [Description("application/soap+xml")] Soap12
+        [Description("application/soap+xml")] 
+        Soap12
     }
 }

@@ -23,21 +23,19 @@ using System.ComponentModel;
 
 namespace SoapClientCallAssist.Enums
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
-    ///     Values that represent SOAP namespace types.
+    ///     The SOAP envelope namespaces, one per protocol version.
     /// </summary>
-    /// =================================================================================================
     internal enum SoapNamespaceType
     {
         /// <summary>
-        ///     An enum constant representing the SOAP 1.1 option.
+        ///     The SOAP 1.1 envelope namespace.
         /// </summary>
         [Description("http://schemas.xmlsoap.org/soap/envelope/")]
         Soap11,
 
         /// <summary>
-        ///     An enum constant representing the SOAP 1.2 option.
+        ///     The SOAP 1.2 envelope namespace.
         /// </summary>
         [Description("http://www.w3.org/2003/05/soap-envelope")]
         Soap12

@@ -4,7 +4,7 @@
 //  Created On        : 2026-08-31 13:08
 // 
 //  Last Modified By : RzR
-//  Last Modified On : 2026-08-31 20:42
+//  Last Modified On : 2026-09-04 22:44
 //  ***********************************************************************
 //  <copyright file="SoapMemberMap.cs" company="RzR SOFT & TECH">
 //      Copyright (c) RzR. All rights reserved.
@@ -34,12 +34,12 @@ namespace SoapClientCallAssist.Dto.Map
     internal sealed class SoapMemberMap
     {
         /// <summary>
-        ///     (Immutable) the shared empty path, used by every member that binds directly by name.
+        ///     The shared empty path of a member that binds directly by name.
         /// </summary>
         private static readonly string[] EmptyPath = new string[0];
 
         /// <summary>
-        ///     (Immutable) the response binding path segments.
+        ///     The response binding path segments.
         /// </summary>
         private readonly string[] _pathSegments;
 
@@ -49,23 +49,13 @@ namespace SoapClientCallAssist.Dto.Map
         /// <param name="property">The reflected property this map is built from.</param>
         /// <param name="wireName">The fully resolved, namespace qualified element name.</param>
         /// <param name="order">The emit order, or -1 when unspecified.</param>
-        /// <param name="pathSegments">
-        ///     The response binding local names, or null when the member binds directly by
-        ///     <paramref name="wireName" />.
-        /// </param>
-        /// <param name="itemName">
-        ///     The per item element name for a collection, or null to fall back to the item contract
-        ///     name.
-        /// </param>
+        /// <param name="pathSegments">Response binding local names, or null to bind by name.</param>
+        /// <param name="itemName">Per item element name, or null for the item contract name.</param>
         /// <param name="memberType">The declared CLR type of the property.</param>
-        /// <param name="collectionItemType">
-        ///     The CLR item type when <paramref name="kind" /> is
-        ///     <see cref="SoapValueKind.Collection" />; otherwise null.
-        /// </param>
+        /// <param name="collectionItemType">The item type of a collection member, or null.</param>
         /// <param name="kind">The XML representation of the value.</param>
-        internal SoapMemberMap(
-            PropertyInfo property, XName wireName, int order, string[] pathSegments,
-            string itemName, Type memberType, Type collectionItemType, SoapValueKind kind)
+        internal SoapMemberMap(PropertyInfo property, XName wireName, int order, string[] pathSegments,
+            string itemName, Type memberType, Type collectionItemType, SoapValueKindType kind)
         {
             Property = property;
             WireName = wireName;
@@ -130,8 +120,7 @@ namespace SoapClientCallAssist.Dto.Map
         internal Type MemberType { get; }
 
         /// <summary>
-        ///     Gets the CLR item type of collection member, or null when the member is not a
-        ///     collection.
+        ///     The CLR item type of a collection member, or null when the member is not a collection.
         /// </summary>
         /// <value>
         ///     The type of the collection item.
@@ -144,6 +133,6 @@ namespace SoapClientCallAssist.Dto.Map
         /// <value>
         ///     The kind.
         /// </value>
-        internal SoapValueKind Kind { get; }
+        internal SoapValueKindType Kind { get; }
     }
 }
