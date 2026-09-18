@@ -564,7 +564,7 @@ public sealed class TierBResponseDecryptionTests
     [TestMethod]
     public void ResponseSecurity_HoldsNoTransportSoADecryptionFailureCanTakeNoWireAction_Test()
     {
-        foreach (var type in new[] { typeof(WsSecurityResponseSecurity), WsSecurityFoundationTestSupport.LibraryType("SoapClientCallAssist.Security.WsSecurityResponseDecryptor") })
+        foreach (var type in new[] { typeof(WsSecurityResponseSecurity), WsSecurityFoundationTestSupport.LibraryType("SoapClientCallAssist.Security.WsSecurity.WsSecurityResponseDecryptor") })
         {
             var fields = type.GetFields(System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.NonPublic);
 

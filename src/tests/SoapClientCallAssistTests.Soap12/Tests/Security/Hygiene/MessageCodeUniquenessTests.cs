@@ -37,7 +37,7 @@ public sealed class MessageCodeUniquenessTests
     [TestMethod]
     public void MessageCodesType_EveryMemberHasExactlyOneMessageAcrossTheTwoDictionaries_Test()
     {
-        var helper = WsSecurityFoundationTestSupport.LibraryType("SoapClientCallAssist.Helper.DefaultResultMessageHelper");
+        var helper = WsSecurityFoundationTestSupport.LibraryType("SoapClientCallAssist.Helpers.DefaultResultMessageHelper");
 
         var errors = Keys(helper, "ErrorMessages");
         var validations = Keys(helper, "ValidationMessages");

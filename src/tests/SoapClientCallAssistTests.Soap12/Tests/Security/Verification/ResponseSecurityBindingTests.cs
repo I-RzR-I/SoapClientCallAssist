@@ -333,7 +333,7 @@ public sealed class ResponseSecurityBindingTests
             signedXmlType, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public, null, new object[] { document }, null);
         signedXml.LoadXml(signature);
 
-        var helper = WsSecurityFoundationTestSupport.LibraryType("SoapClientCallAssist.Security.WsSecurityResponseBinding");
+        var helper = WsSecurityFoundationTestSupport.LibraryType("SoapClientCallAssist.Security.WsSecurity.WsSecurityResponseBinding");
         var refuse = helper.GetMethod("RefuseReflectedSignatureValue", BindingFlags.Static | BindingFlags.NonPublic);
 
         var reflected = (IResult)refuse.Invoke(null, new object[] { signedXml, ours });
@@ -347,7 +347,7 @@ public sealed class ResponseSecurityBindingTests
     [TestMethod]
     public void FixedTimeEquals_ComparesWholeArraysAndNeverThrows_Test()
     {
-        var helper = WsSecurityFoundationTestSupport.LibraryType("SoapClientCallAssist.Security.WsSecurityResponseBinding");
+        var helper = WsSecurityFoundationTestSupport.LibraryType("SoapClientCallAssist.Security.WsSecurity.WsSecurityResponseBinding");
         var equals = helper.GetMethod("FixedTimeEquals", BindingFlags.Static | BindingFlags.NonPublic);
 
         bool Compare(byte[] left, byte[] right) => (bool)equals.Invoke(null, new object[] { left, right });

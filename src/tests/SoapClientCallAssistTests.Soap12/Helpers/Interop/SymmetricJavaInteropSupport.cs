@@ -55,7 +55,7 @@ internal static class SymmetricJavaInteropSupport
     private const int NonceLength = 16;
 
     private static readonly Type Derivation =
-        WsSecurityFoundationTestSupport.LibraryType("SoapClientCallAssist.Security.WsSecurityKeyDerivation");
+        WsSecurityFoundationTestSupport.LibraryType("SoapClientCallAssist.Security.WsSecurity.WsSecurityKeyDerivation");
 
     internal static IReadOnlyDictionary<string, SymmetricJavaInteropExpectation> Emit(string directory)
     {

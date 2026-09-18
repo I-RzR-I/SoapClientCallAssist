@@ -69,9 +69,9 @@ public sealed class SymmetricStatelessnessTests
     }
 
     [DataTestMethod]
-    [DataRow("SoapClientCallAssist.Security.WsSecuritySymmetricResponseVerifier")]
-    [DataRow("SoapClientCallAssist.Security.WsSecurityKeyDerivation")]
-    [DataRow("SoapClientCallAssist.Security.WsSecurityEncryptor")]
+    [DataRow("SoapClientCallAssist.Security.WsSecurity.WsSecuritySymmetricResponseVerifier")]
+    [DataRow("SoapClientCallAssist.Security.WsSecurity.WsSecurityKeyDerivation")]
+    [DataRow("SoapClientCallAssist.Security.WsSecurity.WsSecurityEncryptor")]
     public void SymmetricHelpers_AreStaticAndDeclareNoInstanceState_Test(string fullName)
     {
         var type = WsSecurityFoundationTestSupport.LibraryType(fullName);

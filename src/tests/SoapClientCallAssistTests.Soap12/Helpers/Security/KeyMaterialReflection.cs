@@ -20,11 +20,11 @@ internal static class KeyMaterialReflection
 
     private const BindingFlags Any = BindingFlags.Instance | BindingFlags.Static | BindingFlags.Public | BindingFlags.NonPublic;
 
-    internal static readonly Type BuilderType = WsSecurityFoundationTestSupport.LibraryType("SoapClientCallAssist.Security.WsSecurityHeaderBuilder");
+    internal static readonly Type BuilderType = WsSecurityFoundationTestSupport.LibraryType("SoapClientCallAssist.Security.WsSecurity.WsSecurityHeaderBuilder");
 
     internal static readonly Type PlannerType = WsSecurityFoundationTestSupport.LibraryType("SoapClientCallAssist.Security.SoapSecurityPlanner");
 
-    internal static readonly Type BuildResultType = WsSecurityFoundationTestSupport.LibraryType("SoapClientCallAssist.Security.WsSecurityHeaderBuildResult");
+    internal static readonly Type BuildResultType = WsSecurityFoundationTestSupport.LibraryType("SoapClientCallAssist.Security.WsSecurity.WsSecurityHeaderBuildResult");
 
     internal static readonly Type KeySourceType = WsSecurityFoundationTestSupport.LibraryType("SoapClientCallAssist.Security.SymmetricKeySource");
 
