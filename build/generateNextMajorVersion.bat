@@ -29,7 +29,7 @@ set customVersion=$null
 set solutionPath=$('..\src\RzR.Shared.Services.sln')
 set packResultPath=$('..\nuget\')
 set packProjectsPath=$('..\src\SoapClientCallAssist\SoapClientCallAssist.csproj')
-set testProjectsPath=$('..\src\tests\SoapClientCallAssistTests.Soap12\SoapClientCallAssistTests.Soap12.csproj','..\src\tests\SoapClientCallAssistTests.Wcf\SoapClientCallAssistTests.Wcf.csproj','..\src\tests\SoapClientCallAssistTests\SoapClientCallAssistTests.csproj')
+set testProjectsPath=$('..\src\tests\SoapClientCallAssistTests\SoapClientCallAssistTests.csproj')
 
 
 echo :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
