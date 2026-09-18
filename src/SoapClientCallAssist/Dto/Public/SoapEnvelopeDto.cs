@@ -1,20 +1,21 @@
 ﻿// ***********************************************************************
-//  Assembly         : RzR.Shared.Services.SoapClientCallAssist
-//  Author           : RzR
-//  Created On       : 2024-09-22 18:39
+//  Assembly          : RzR.Shared.Services.SoapClientCallAssist
+//  Author            : RzR
+//  Created On        : 2024-09-22 18:39
 // 
 //  Last Modified By : RzR
-//  Last Modified On : 2024-09-22 18:50
-// ***********************************************************************
-//  <copyright file="SoapEnvelopeDto.cs" company="">
-//   Copyright (c) RzR. All rights reserved.
+//  Last Modified On : 2026-08-31 20:42
+//  ***********************************************************************
+//  <copyright file="SoapEnvelopeDto.cs" company="RzR SOFT & TECH">
+//      Copyright (c) RzR. All rights reserved.
 //  </copyright>
-// 
-//  <summary>
-//  </summary>
-// ***********************************************************************
+//  <contact>
+//      https://iamrzr.dev/contact
+//  </contact>
+//  <summary></summary>
+//  ***********************************************************************
 
-#region U S A G E S
+#region U S I N G
 
 using System;
 using System.Collections.Generic;
@@ -24,90 +25,56 @@ using System.Xml.Linq;
 
 namespace SoapClientCallAssist.Dto.Public
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
-    ///     A SOAP envelope data transfer object.
+    ///     The content of a SOAP envelope, made of the Body elements, the Header elements, the action
+    ///     and any extra Envelope attributes.
     /// </summary>
-    /// =================================================================================================
     public class SoapEnvelopeDto
     {
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        ///     Gets or sets the action.
+        ///     Initializes a new instance of the <see cref="SoapEnvelopeDto" /> class.
         /// </summary>
-        /// <value>
-        ///     The action.
-        /// </value>
-        /// =================================================================================================
-        public string Action { get; set; }
+        public SoapEnvelopeDto() { }
 
-        /// -------------------------------------------------------------------------------------------------
         /// <summary>
-        ///     Gets or sets the bodies.
+        ///     Initializes a new instance of the <see cref="SoapEnvelopeDto" /> class.
         /// </summary>
-        /// <value>
-        ///     The bodies.
-        /// </value>
-        /// =================================================================================================
-        public IEnumerable<XElement> Bodies { get; set; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        ///     Gets or sets the headers.
-        /// </summary>
-        /// <value>
-        ///     The headers.
-        /// </value>
-        /// =================================================================================================
-        public IEnumerable<XElement> Headers { get; set; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        ///     Gets or sets the own SOAP envelope attributes.
-        /// </summary>
-        /// <value>
-        ///     The own SOAP envelope attributes.
-        /// </value>
-        /// =================================================================================================
-        public IEnumerable<XAttribute> OwnSoapEnvelopeAttributes { get; set; }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="SoapEnvelopeDto"/> class.
-        /// </summary>
-        /// =================================================================================================
-        public SoapEnvelopeDto()
-        {
-        }
-
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="SoapEnvelopeDto"/> class.
-        /// </summary>
-        /// <param name="bodies">The bodies.</param>
+        /// <param name="bodies">The elements placed inside the SOAP Body.</param>
         /// <param name="headers">
-        ///     (Optional)
-        ///     The headers.
+        ///     (Optional) The elements placed inside the SOAP Header, or null for none.
         /// </param>
-        /// <param name="action">
-        ///     (Optional)
-        ///     The action.
-        /// </param>
+        /// <param name="action">(Optional) The SOAP action, or null to send none.</param>
         /// <param name="ownSoapEnvelopeAttributes">
-        ///     (Optional)
-        ///     The own SOAP envelope attributes.
+        ///     (Optional) Extra Envelope attributes, or null for none.
         /// </param>
-        /// =================================================================================================
-        public SoapEnvelopeDto(
-            IEnumerable<XElement> bodies, 
-            IEnumerable<XElement> headers = null,
-            string action = null,
-            IEnumerable<XAttribute> ownSoapEnvelopeAttributes = null)
+        public SoapEnvelopeDto(IEnumerable<XElement> bodies, IEnumerable<XElement> headers = null,
+            string action = null, IEnumerable<XAttribute> ownSoapEnvelopeAttributes = null)
         {
             Action = action;
             Bodies = bodies;
             Headers = headers ?? Array.Empty<XElement>();
             OwnSoapEnvelopeAttributes = ownSoapEnvelopeAttributes ?? Array.Empty<XAttribute>();
         }
+
+        /// <summary>
+        ///     The SOAP action, sent as the <c>SOAPAction</c> and <c>Action</c> HTTP headers and as an
+        ///     <c>Action</c> header element; <see langword="null" /> sends none.
+        /// </summary>
+        public string Action { get; set; }
+
+        /// <summary>
+        ///     The elements placed inside the SOAP Body.
+        /// </summary>
+        public IEnumerable<XElement> Bodies { get; set; }
+
+        /// <summary>
+        ///     The elements placed inside the SOAP Header.
+        /// </summary>
+        public IEnumerable<XElement> Headers { get; set; }
+
+        /// <summary>
+        ///     Extra attributes added to the Envelope element beside the protocol namespace declaration.
+        /// </summary>
+        public IEnumerable<XAttribute> OwnSoapEnvelopeAttributes { get; set; }
     }
 }

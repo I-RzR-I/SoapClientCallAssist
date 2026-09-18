@@ -1,0 +1,8 @@
+﻿<%@ ServiceHost 
+    Language="C#" 
+    Debug="true" 
+    Service="TestSoapServiceN45.ServiceSvc" 
+    CodeBehind="ServiceSvc.svc.cs" 
+    
+    %>
+//Factory=System.ServiceModel.Activation.WebScriptServiceHostFactory

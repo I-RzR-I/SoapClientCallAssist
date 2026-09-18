@@ -1,20 +1,21 @@
 ﻿// ***********************************************************************
-//  Assembly         : RzR.Shared.Services.SoapClientCallAssist
-//  Author           : RzR
-//  Created On       : 2024-09-15 18:16
+//  Assembly          : RzR.Shared.Services.SoapClientCallAssist
+//  Author            : RzR
+//  Created On        : 2024-09-15 18:16
 // 
 //  Last Modified By : RzR
-//  Last Modified On : 2024-09-15 18:40
-// ***********************************************************************
-//  <copyright file="SoapNamespaceType.cs" company="">
-//   Copyright (c) RzR. All rights reserved.
+//  Last Modified On : 2026-08-31 20:42
+//  ***********************************************************************
+//  <copyright file="SoapNamespaceType.cs" company="RzR SOFT & TECH">
+//      Copyright (c) RzR. All rights reserved.
 //  </copyright>
-// 
-//  <summary>
-//  </summary>
-// ***********************************************************************
+//  <contact>
+//      https://iamrzr.dev/contact
+//  </contact>
+//  <summary></summary>
+//  ***********************************************************************
 
-#region U S A G E S
+#region U S I N G
 
 using System.ComponentModel;
 
@@ -22,23 +23,21 @@ using System.ComponentModel;
 
 namespace SoapClientCallAssist.Enums
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
-    ///     Values that represent SOAP namespace types.
+    ///     The SOAP envelope namespaces, one per protocol version.
     /// </summary>
-    /// =================================================================================================
     internal enum SoapNamespaceType
     {
         /// <summary>
-        ///     An enum constant representing the SOAP 1.1 option.
+        ///     The SOAP 1.1 envelope namespace.
         /// </summary>
-        [Description("http://schemas.xmlsoap.org/soap/envelope/")] 
+        [Description("http://schemas.xmlsoap.org/soap/envelope/")]
         Soap11,
 
         /// <summary>
-        ///     An enum constant representing the SOAP 1.2 option.
+        ///     The SOAP 1.2 envelope namespace.
         /// </summary>
-        [Description("http://www.w3.org/2003/05/soap-envelope")] 
+        [Description("http://www.w3.org/2003/05/soap-envelope")]
         Soap12
     }
 }

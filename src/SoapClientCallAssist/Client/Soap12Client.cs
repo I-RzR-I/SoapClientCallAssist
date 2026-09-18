@@ -1,31 +1,32 @@
 ﻿// ***********************************************************************
-//  Assembly         : RzR.Shared.Services.SoapClientCallAssist
-//  Author           : RzR
-//  Created On       : 2024-09-12 19:05
+//  Assembly          : RzR.Shared.Services.SoapClientCallAssist
+//  Author            : RzR
+//  Created On        : 2024-09-12 19:05
 // 
 //  Last Modified By : RzR
-//  Last Modified On : 2024-09-15 19:25
-// ***********************************************************************
-//  <copyright file="Soap12Client.cs" company="">
-//   Copyright (c) RzR. All rights reserved.
+//  Last Modified On : 2026-09-11 21:10
+//  ***********************************************************************
+//  <copyright file="Soap12Client.cs" company="RzR SOFT & TECH">
+//      Copyright (c) RzR. All rights reserved.
 //  </copyright>
-// 
-//  <summary>
-//  </summary>
-// ***********************************************************************
+//  <contact>
+//      https://iamrzr.dev/contact
+//  </contact>
+//  <summary></summary>
+//  ***********************************************************************
 
-#region U S A G E S
+#region U S I N G
 
-using AggregatedGenericResultMessage;
-using AggregatedGenericResultMessage.Abstractions;
-using AggregatedGenericResultMessage.Extensions.Result;
-using DomainCommonExtensions.CommonExtensions;
-using DomainCommonExtensions.DataTypeExtensions;
+using RzR.Extensions.Domain.Primitives;
+using RzR.ResultMessage;
+using RzR.ResultMessage.Abstractions;
+using RzR.ResultMessage.Extensions.Result;
 using SoapClientCallAssist.Abstractions;
 using SoapClientCallAssist.Dto;
 using SoapClientCallAssist.Dto.Public;
 using SoapClientCallAssist.Enums;
-using SoapClientCallAssist.Helper;
+using SoapClientCallAssist.Extensions;
+using SoapClientCallAssist.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Net.Http;
@@ -38,36 +39,42 @@ using System.Xml.Linq;
 
 namespace SoapClientCallAssist.Client
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
-    ///     SOAP 1.2 client.
+    ///     The SOAP 1.2 client, sending <c>application/soap+xml</c> envelopes in the SOAP 1.2 namespace.
     /// </summary>
-    /// <seealso cref="T:SoapClientCallAssist.Client.BaseEndpointClient"/>
-    /// <seealso cref="T:SoapClientCallAssist.Abstractions.ISoapClientEndpoint"/>
-    /// =================================================================================================
     public sealed class Soap12Client : BaseEndpointClient, ISoapClientEndpoint
     {
-        /// -------------------------------------------------------------------------------------------------
-        /// <summary>
-        ///     The client time out.
-        /// </summary>
-        /// =================================================================================================
-        private TimeSpan _clientTimeOut = TimeSpan.FromMinutes(2);
-
         /// <inheritdoc/>
         public Soap12Client(IHttpClientFactory clientFactory) : base(clientFactory) { }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="Soap12Client" /> class with the verifier
+        ///     response signatures are checked with when the security options of a call name none.
+        /// 
+        /// </summary>
+        /// <param name="clientFactory">HTTP client factory.</param>
+        /// <param name="responseVerifier">The response verifier, or null for the library's own.</param>
+        public Soap12Client(IHttpClientFactory clientFactory, ISoapMessageVerifier responseVerifier)
+            : base(clientFactory, responseVerifier) { }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="Soap12Client" /> class with the verifier and
+        ///     the response security service.
+        /// </summary>
+        /// <param name="clientFactory">HTTP client factory.</param>
+        /// <param name="responseVerifier">The response verifier, or null for the library's own.</param>
+        /// <param name="responseSecurity">The response security service, or null to build one.</param>
+        public Soap12Client(IHttpClientFactory clientFactory, ISoapMessageVerifier responseVerifier,
+            ISoapResponseSecurity responseSecurity)
+            : base(clientFactory, responseVerifier, responseSecurity) { }
 
         /// <inheritdoc/>
         public Soap12Client() { }
 
         /// <inheritdoc/>
-        public IResult<HttpRequestMessage> BuildRequest(
-            HttpMethod method,
-            Uri endpoint,
-            IEnumerable<XElement> bodies,
-            IEnumerable<XElement> headers = null,
-            Encoding bodyEncoding = null,
-            string action = null,
+        public IResult<HttpRequestMessage> BuildRequest(HttpMethod method, Uri endpoint,
+            IEnumerable<XElement> bodies, IEnumerable<XElement> headers = null,
+            Encoding bodyEncoding = null, string action = null,
             IEnumerable<XAttribute> ownSoapEnvelopeAttributes = null,
             Dictionary<string, IEnumerable<string>> httpClientHeaders = null,
             bool buildGetRequestAsSlashUrl = false)
@@ -77,38 +84,36 @@ namespace SoapClientCallAssist.Client
                 var requestMessage = BuildRequest(
                     method,
                     new BuildSoapRequestDto(
-                        new HttpClientDto()
+                        new HttpClientDto
                         {
                             BodyEncoding = bodyEncoding,
                             BuildGetRequestAsSlashUrl = buildGetRequestAsSlashUrl,
                             Endpoint = endpoint,
                             HttpClientHeaders = httpClientHeaders
                         },
-                        new SoapEnvelopeDto()
+                        new SoapEnvelopeDto
                         {
                             Bodies = bodies,
-                            Headers = headers,
+                            Headers = headers, 
                             OwnSoapEnvelopeAttributes = ownSoapEnvelopeAttributes,
                             Action = action
                         }
                     ));
 
-                return requestMessage.IsSuccess.IsFalse() 
-                    ? Result<HttpRequestMessage>.Failure(requestMessage.GetFirstMessage()) 
+                return requestMessage.IsSuccess.IsFalse()
+                    ? Result<HttpRequestMessage>.Failure(requestMessage.GetFirstMessage())
                     : Result<HttpRequestMessage>.Success(requestMessage.Response);
             }
             catch (Exception e)
             {
                 return Result<HttpRequestMessage>
-                    .Failure(MessageCodesType.ER_S12_BSR.GetDescription(), DefaultResultMessageHelper.ErrorMessages[MessageCodesType.ER_S12_BSR])
+                    .Failure(MessageCodesType.ER_S12_BSR.GetDescription(), DefaultResultMessageHelper.GetErrorMessage(MessageCodesType.ER_S12_BSR))
                     .WithError(e);
             }
         }
 
         /// <inheritdoc/>
-        public IResult<HttpRequestMessage> BuildRequest(
-            HttpMethod method,
-            BuildSoapRequestDto soapRequest)
+        public IResult<HttpRequestMessage> BuildRequest(HttpMethod method, BuildSoapRequestDto soapRequest)
         {
             try
             {
@@ -126,69 +131,58 @@ namespace SoapClientCallAssist.Client
                         SoapUri = soapRequest.Client.Endpoint,
                         OwnSoapEnvelopeAttributes = soapRequest.Envelope.OwnSoapEnvelopeAttributes,
                         HttpClientHeaders = soapRequest.Client.HttpClientHeaders,
-                        BuildGetRequestAsSlashUrl = soapRequest.Client.BuildGetRequestAsSlashUrl
+                        BuildGetRequestAsSlashUrl = soapRequest.Client.BuildGetRequestAsSlashUrl,
+                        Security = soapRequest.Security
                     });
 
                 return requestMessage.IsSuccess.IsFalse()
-                    ? Result<HttpRequestMessage>.Failure(requestMessage.GetFirstMessage())
+                    ? requestMessage.Propagate<HttpRequestMessage>()
                     : Result<HttpRequestMessage>.Success(requestMessage.Response);
             }
             catch (Exception e)
             {
                 return Result<HttpRequestMessage>
-                    .Failure(MessageCodesType.ER_S12_BSR.GetDescription(), DefaultResultMessageHelper.ErrorMessages[MessageCodesType.ER_S12_BSR])
+                    .Failure(MessageCodesType.ER_S12_BSR.GetDescription(), DefaultResultMessageHelper.GetErrorMessage(MessageCodesType.ER_S12_BSR))
                     .WithError(e);
             }
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public IResult<HttpResponseMessage> SendRequest(HttpRequestMessage request)
         {
             try
             {
-                var soapResult = base.SendRequest(request, _clientTimeOut);
-
-                return soapResult.IsSuccess.IsFalse()
-                    ? Result<HttpResponseMessage>.Failure(soapResult.GetFirstMessage()) 
-                    : Result<HttpResponseMessage>.Success(soapResult.Response);
+                return base.SendRequest(request, ClientTimeout);
             }
             catch (Exception e)
             {
                 return Result<HttpResponseMessage>
-                    .Failure(MessageCodesType.ER_S12_SR.GetDescription(), DefaultResultMessageHelper.ErrorMessages[MessageCodesType.ER_S12_SR])
+                    .Failure(MessageCodesType.ER_S12_SR.GetDescription(), DefaultResultMessageHelper.GetErrorMessage(MessageCodesType.ER_S12_SR))
                     .WithError(e);
             }
         }
 
-        /// <inheritdoc />
-        public async Task<IResult<HttpResponseMessage>> SendRequestAsync(HttpRequestMessage request,
+        /// <inheritdoc/>
+        public async Task<IResult<HttpResponseMessage>> SendRequestAsync(
+            HttpRequestMessage request,
             CancellationToken cancellationToken = default)
         {
             try
             {
-                var soapResult = await base.SendRequestAsync(request, _clientTimeOut, cancellationToken);
-                
-                return soapResult.IsSuccess.IsFalse() 
-                    ? Result<HttpResponseMessage>.Failure(soapResult.GetFirstMessage()) 
-                    : Result<HttpResponseMessage>.Success(soapResult.Response);
+                return await base.SendRequestAsync(request, ClientTimeout, cancellationToken);
             }
             catch (Exception e)
             {
                 return Result<HttpResponseMessage>
-                    .Failure(MessageCodesType.ER_S12_SRA.GetDescription(), DefaultResultMessageHelper.ErrorMessages[MessageCodesType.ER_S12_SRA])
+                    .Failure(MessageCodesType.ER_S12_SRA.GetDescription(), DefaultResultMessageHelper.GetErrorMessage(MessageCodesType.ER_S12_SRA))
                     .WithError(e);
             }
         }
-        /// <inheritdoc />
-        public IResult SetClientTimeout(TimeSpan clientTimeout)
-        {
-            if (clientTimeout.IsNotNull())
-                _clientTimeOut = clientTimeout;
 
-            return Result.Success();
-        }
+        /// <inheritdoc/>
+        public IResult SetClientTimeout(TimeSpan clientTimeout) => ApplyClientTimeout(clientTimeout);
 
-        /// <inheritdoc />
+        /// <inheritdoc/>
         public IResult CheckBodyForFaultCode(string soapResponse)
             => base.CheckBodyForFaultCode(soapResponse, SoapNamespaceType.Soap12.GetDescription());
     }

@@ -1,20 +1,21 @@
 ﻿// ***********************************************************************
-//  Assembly         : RzR.Shared.Services.SoapClientCallAssist
-//  Author           : RzR
-//  Created On       : 2024-09-15 18:14
+//  Assembly          : RzR.Shared.Services.SoapClientCallAssist
+//  Author            : RzR
+//  Created On        : 2024-09-15 18:14
 // 
 //  Last Modified By : RzR
-//  Last Modified On : 2024-09-15 18:40
-// ***********************************************************************
-//  <copyright file="SoapMediaType.cs" company="">
-//   Copyright (c) RzR. All rights reserved.
+//  Last Modified On : 2026-08-31 20:42
+//  ***********************************************************************
+//  <copyright file="SoapMediaType.cs" company="RzR SOFT & TECH">
+//      Copyright (c) RzR. All rights reserved.
 //  </copyright>
-// 
-//  <summary>
-//  </summary>
-// ***********************************************************************
+//  <contact>
+//      https://iamrzr.dev/contact
+//  </contact>
+//  <summary></summary>
+//  ***********************************************************************
 
-#region U S A G E S
+#region U S I N G
 
 using System.ComponentModel;
 
@@ -22,21 +23,19 @@ using System.ComponentModel;
 
 namespace SoapClientCallAssist.Enums
 {
-    /// -------------------------------------------------------------------------------------------------
     /// <summary>
-    ///     Values that represent SOAP media types.
+    ///     The HTTP media types of a SOAP request body, one per protocol version.
     /// </summary>
-    /// =================================================================================================
     internal enum SoapMediaType
     {
         /// <summary>
-        ///     An enum constant representing the SOAP 1.1 option.
+        ///     The SOAP 1.1 media type, <c>text/xml</c>.
         /// </summary>
         [Description("text/xml")] 
         Soap11,
 
         /// <summary>
-        ///     An enum constant representing the SOAP 1.2 option.
+        ///     The SOAP 1.2 media type, <c>application/soap+xml</c>.
         /// </summary>
         [Description("application/soap+xml")] 
         Soap12

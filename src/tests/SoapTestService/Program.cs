@@ -1,0 +1,1 @@
+SoapTestHost.Build(args).Run();

@@ -4,10 +4,8 @@ using SoapClientCallAssist.Abstractions;
 using SoapClientCallAssist.Dto.Public;
 using SoapClientCallAssist.Enums;
 using System;
-using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
-using System.Xml.Linq;
 
 #pragma disable CS0017
 
