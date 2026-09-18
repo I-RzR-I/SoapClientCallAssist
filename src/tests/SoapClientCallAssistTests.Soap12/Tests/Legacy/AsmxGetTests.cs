@@ -1,7 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SoapClientCallAssist.Dto.Public;
 using SoapClientCallAssist.Enums;
-using SoapClientCallAssistTests.Soap12.Helpers;
+using SoapClientCallAssistTests.Soap12.Helpers.Protocol;
+using SoapClientCallAssistTests.Soap12.Helpers.Results;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
@@ -29,11 +30,11 @@ public sealed class AsmxGetTests
 
         using var response = Soap12FunctionalSupport.Unwrap(
             client.SendRequest(request),
-            $"SendRequest(GET IsValid, {Protocol})");
+            $"SendRequest {Protocol}");
         var envelope = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
 
         CrossProtocolSupport.AssertRequestWasOnTheWireForProtocol(Protocol, correlationId);
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, $"Response envelope was: {envelope}");
+        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, $"{envelope}");
 
         var payload = CrossProtocolSupport.GetBodyChild(Protocol, envelope);
         SoapAssert.AssertElementValue(payload, "IsValidResult", "1");
@@ -50,16 +51,16 @@ public sealed class AsmxGetTests
                 new HttpClientDto(CrossProtocolSupport.EndpointFor(Protocol)),
                 new SoapEnvelopeDto(new[] { LegacyBodyBuilders.IsValidNoNamespaceRoot() })));
 
-        Assert.IsTrue(built.IsSuccess, $"BuildRequest(DTO overload) must succeed. Got: {NegativeTestSupport.Describe(built)}");
-        Assert.IsNotNull(built.Response, "A successful build must carry a request.");
+        Assert.IsTrue(built.IsSuccess, NegativeTestSupport.Describe(built));
+        Assert.IsNotNull(built.Response);
 
         using var request = built.Response;
         using var response = Soap12FunctionalSupport.Unwrap(
             client.SendRequest(request),
-            $"SendRequest(GET IsValid, DTO overload, {Protocol})");
+            $"SendRequest {Protocol}");
         var envelope = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
 
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, $"Response envelope was: {envelope}");
+        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, $"{envelope}");
 
         var payload = CrossProtocolSupport.GetBodyChild(Protocol, envelope);
         SoapAssert.AssertElementValue(payload, "IsValidResult", "1");
@@ -80,11 +81,11 @@ public sealed class AsmxGetTests
 
         using var response = Soap12FunctionalSupport.Unwrap(
             await client.SendRequestAsync(request),
-            $"SendRequestAsync(GET IsValid, {Protocol})");
+            $"SendRequestAsync {Protocol}");
         var envelope = await response.Content.ReadAsStringAsync();
 
         CrossProtocolSupport.AssertRequestWasOnTheWireForProtocol(Protocol, correlationId);
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, $"Response envelope was: {envelope}");
+        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, $"{envelope}");
 
         var payload = CrossProtocolSupport.GetBodyChild(Protocol, envelope);
         SoapAssert.AssertElementValue(payload, "IsValidResult", "1");
@@ -105,11 +106,11 @@ public sealed class AsmxGetTests
 
         using var response = Soap12FunctionalSupport.Unwrap(
             client.SendRequest(request),
-            $"SendRequest(GET IsValid, qualified children, {Protocol})");
+            $"SendRequest {Protocol}");
         var envelope = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
 
         CrossProtocolSupport.AssertRequestWasOnTheWireForProtocol(Protocol, correlationId);
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, $"Response envelope was: {envelope}");
+        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, $"{envelope}");
 
         var payload = CrossProtocolSupport.GetBodyChild(Protocol, envelope);
         SoapAssert.AssertElementValue(payload, "IsValidResult", "1");
@@ -130,11 +131,11 @@ public sealed class AsmxGetTests
 
         using var response = Soap12FunctionalSupport.Unwrap(
             await client.SendRequestAsync(request),
-            $"SendRequestAsync(GET IsValid, qualified children, {Protocol})");
+            $"SendRequestAsync {Protocol}");
         var envelope = await response.Content.ReadAsStringAsync();
 
         CrossProtocolSupport.AssertRequestWasOnTheWireForProtocol(Protocol, correlationId);
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, $"Response envelope was: {envelope}");
+        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, $"{envelope}");
 
         var payload = CrossProtocolSupport.GetBodyChild(Protocol, envelope);
         SoapAssert.AssertElementValue(payload, "IsValidResult", "1");

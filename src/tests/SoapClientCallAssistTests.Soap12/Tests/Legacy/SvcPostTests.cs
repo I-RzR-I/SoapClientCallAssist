@@ -1,7 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SoapClientCallAssist.Dto.Public;
 using SoapClientCallAssist.Enums;
-using SoapClientCallAssistTests.Soap12.Helpers;
+using SoapClientCallAssistTests.Soap12.Helpers.Protocol;
+using SoapClientCallAssistTests.Soap12.Helpers.Results;
 using System;
 using System.Linq;
 using System.Net;
@@ -30,10 +31,7 @@ public sealed class SvcPostTests
 
         var payload = CrossProtocolSupport.GetBodyChild(Protocol, envelope);
 
-        Assert.AreEqual(
-            (LegacyBodyBuilders.Service + "HelloWorldResponse").ToString(),
-            payload.Name.ToString(),
-            $"Expected the conventional HelloWorldResponse element. Envelope was: {envelope}");
+        Assert.AreEqual((LegacyBodyBuilders.Service + "HelloWorldResponse").ToString(), payload.Name.ToString(), $"{envelope}");
         SoapAssert.AssertElementValue(payload, "HelloWorldResult", "Hello World");
     }
 
@@ -52,19 +50,17 @@ public sealed class SvcPostTests
             Soap12FunctionalSupport.HelloWorldBody(),
             httpClientHeaders: headers);
 
-        Assert.IsTrue(built.IsSuccess, $"BuildRequest with a custom HTTP header must succeed. Got: {NegativeTestSupport.Describe(built)}");
-        Assert.IsNotNull(built.Response, "A successful build must carry a request.");
+        Assert.IsTrue(built.IsSuccess, NegativeTestSupport.Describe(built));
+        Assert.IsNotNull(built.Response);
 
         using var request = built.Response;
-        using var response = Soap12FunctionalSupport.Unwrap(client.SendRequest(request), "SendRequest(HelloWorld, custom header)");
+        using var response = Soap12FunctionalSupport.Unwrap(client.SendRequest(request), "SendRequest");
         var envelope = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
 
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, $"Response envelope was: {envelope}");
+        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, $"{envelope}");
 
         var recorded = Soap12FunctionalSupport.FindRecorded(correlationId);
-        Assert.IsTrue(
-            recorded.Headers.TryGetValue("UserAgent", out var values) && values.Contains("test"),
-            "The custom 'UserAgent' header supplied via httpClientHeaders must reach the service unchanged.");
+        Assert.IsTrue(recorded.Headers.TryGetValue("UserAgent", out var values) && values.Contains("test"));
     }
 
     [TestMethod]
@@ -140,29 +136,22 @@ public sealed class SvcPostTests
             correlationId,
             endpoint: SPrefixedEndpoint);
 
-        using var response = Soap12FunctionalSupport.Unwrap(client.SendRequest(request), "SendRequest(IsValid, s-prefixed envelope)");
+        using var response = Soap12FunctionalSupport.Unwrap(client.SendRequest(request), "SendRequest");
         var envelope = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
 
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, $"Response envelope was: {envelope}");
-        StringAssert.Contains(envelope, "<s:Body>", $"Requesting ?prefix=s must render the WCF-style s: prefix. Envelope was: {envelope}");
+        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, $"{envelope}");
+        StringAssert.Contains(envelope, "<s:Body>");
 
         var payload = SoapAssert.GetBodyChild(envelope, SoapAssert.Soap12Ns);
         SoapAssert.AssertElementValue(payload, "IsValidResult", "1");
 
         var faultCheck = client.CheckBodyForFaultCode(envelope);
-        Assert.IsTrue(
-            faultCheck.IsSuccess,
-            $"A fault-free IsValid response must report success. Got: {NegativeTestSupport.Describe(faultCheck)}");
+        Assert.IsTrue(faultCheck.IsSuccess, NegativeTestSupport.Describe(faultCheck));
 
         var xmlNode = client.GetXmlNodeResponseBody(envelope, soapXmlBodyTag: "s:Body");
-        Assert.IsTrue(
-            xmlNode.IsSuccess,
-            $"An explicit s:Body tag must extract the payload from an s-prefixed envelope. Got: {NegativeTestSupport.Describe(xmlNode)}");
-        Assert.IsNotNull(xmlNode.Response, "A successful extraction must carry a node.");
-        Assert.AreEqual(
-            "IsValidResponse",
-            xmlNode.Response!.LocalName,
-            $"Expected the IsValidResponse element. Envelope was: {envelope}");
+        Assert.IsTrue(xmlNode.IsSuccess, NegativeTestSupport.Describe(xmlNode));
+        Assert.IsNotNull(xmlNode.Response);
+        Assert.AreEqual("IsValidResponse", xmlNode.Response!.LocalName, $"{envelope}");
     }
 
     [TestMethod]
@@ -177,22 +166,17 @@ public sealed class SvcPostTests
             new[] { LegacyBodyBuilders.AddRecordWithDetailEmpty() },
             correlationId);
 
-        using var response = Soap12FunctionalSupport.Unwrap(
+        using var response = Soap12FunctionalSupport.UnwrapRejected(
             client.SendRequest(request),
-            $"SendRequest(AddRecordWithDetail, missing product, {Protocol})");
+            NegativeTestSupport.HttpSoapFaultCode,
+            $"SendRequest {Protocol}");
         var envelope = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
 
-        Assert.AreEqual(
-            HttpStatusCode.InternalServerError,
-            response.StatusCode,
-            $"A missing required argument must fault with HTTP 500. Envelope was: {envelope}");
+        Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode, $"{envelope}");
 
         var faultCheck = client.CheckBodyForFaultCode(envelope);
-        Assert.IsFalse(faultCheck.IsSuccess, $"A fault response must be classified as a failure. Envelope was: {envelope}");
-        StringAssert.Contains(
-            NegativeTestSupport.FirstMessageInfo(faultCheck),
-            "Argument 'product' is required.",
-            $"The fault reason must reach the caller. Envelope was: {envelope}");
+        Assert.IsFalse(faultCheck.IsSuccess, $"{envelope}");
+        StringAssert.Contains(NegativeTestSupport.FirstMessageInfo(faultCheck), "Argument 'product' is required.", $"{envelope}");
     }
 
     [TestMethod]
@@ -208,15 +192,15 @@ public sealed class SvcPostTests
             ownSoapEnvelopeAttributes: LegacyBodyBuilders.DualNamespaceEnvelopeAttributes(),
             httpClientHeaders: Soap12FunctionalSupport.CorrelationHeaders(correlationId));
 
-        Assert.IsTrue(built.IsSuccess, $"BuildRequest(flat overload) must succeed. Got: {NegativeTestSupport.Describe(built)}");
-        Assert.IsNotNull(built.Response, "A successful build must carry a request.");
+        Assert.IsTrue(built.IsSuccess, NegativeTestSupport.Describe(built));
+        Assert.IsNotNull(built.Response);
 
         using var request = built.Response;
-        using var response = Soap12FunctionalSupport.Unwrap(client.SendRequest(request), "SendRequest(AddRecordWithDetail, flat overload)");
+        using var response = Soap12FunctionalSupport.Unwrap(client.SendRequest(request), "SendRequest");
         var envelope = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
 
         CrossProtocolSupport.AssertRequestWasOnTheWireForProtocol(Protocol, correlationId);
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, $"Response envelope was: {envelope}");
+        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, $"{envelope}");
 
         var payload = SoapAssert.GetBodyChild(envelope, SoapAssert.Soap12Ns);
         Soap12FunctionalSupport.AssertChildValue(payload, LegacyBodyBuilders.Service + "AddRecordWithDetailResult", "true");
@@ -233,16 +217,12 @@ public sealed class SvcPostTests
         Soap12FunctionalSupport.AssertChildValue(detail, LegacyBodyBuilders.Service + "PartnerId", "3");
 
         var xmlNodeResponse = client.GetXmlNodeResponseBody(envelope, soapXmlBodyTag: "s:Body");
-        Assert.IsTrue(
-            xmlNodeResponse.IsSuccess,
-            $"An explicit s:Body tag must extract the payload from an s-prefixed envelope. Got: {NegativeTestSupport.Describe(xmlNodeResponse)}");
-        Assert.IsNotNull(xmlNodeResponse.Response, "A successful extraction must carry a node.");
+        Assert.IsTrue(xmlNodeResponse.IsSuccess, NegativeTestSupport.Describe(xmlNodeResponse));
+        Assert.IsNotNull(xmlNodeResponse.Response);
 
         var xNodeResponse = client.GetXNodeResponseBody(envelope, soapXmlBodyTag: "s:Body");
-        Assert.IsTrue(
-            xNodeResponse.IsSuccess,
-            $"An explicit s:Body tag must also work for GetXNodeResponseBody. Got: {NegativeTestSupport.Describe(xNodeResponse)}");
-        Assert.IsNotNull(xNodeResponse.Response, "A successful extraction must carry a node.");
+        Assert.IsTrue(xNodeResponse.IsSuccess, NegativeTestSupport.Describe(xNodeResponse));
+        Assert.IsNotNull(xNodeResponse.Response);
     }
 
     [TestMethod]
@@ -259,15 +239,15 @@ public sealed class SvcPostTests
                     new[] { LegacyBodyBuilders.AddRecordWithDetailDualNamespace() },
                     ownSoapEnvelopeAttributes: LegacyBodyBuilders.DualNamespaceEnvelopeAttributes())));
 
-        Assert.IsTrue(built.IsSuccess, $"BuildRequest(DTO overload) must succeed. Got: {NegativeTestSupport.Describe(built)}");
-        Assert.IsNotNull(built.Response, "A successful build must carry a request.");
+        Assert.IsTrue(built.IsSuccess, NegativeTestSupport.Describe(built));
+        Assert.IsNotNull(built.Response);
 
         using var request = built.Response;
-        using var response = Soap12FunctionalSupport.Unwrap(client.SendRequest(request), "SendRequest(AddRecordWithDetail, DTO overload)");
+        using var response = Soap12FunctionalSupport.Unwrap(client.SendRequest(request), "SendRequest");
         var envelope = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
 
         CrossProtocolSupport.AssertRequestWasOnTheWireForProtocol(Protocol, correlationId);
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, $"Response envelope was: {envelope}");
+        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, $"{envelope}");
 
         var payload = SoapAssert.GetBodyChild(envelope, SoapAssert.Soap12Ns);
         Soap12FunctionalSupport.AssertChildValue(payload, LegacyBodyBuilders.Service + "AddRecordWithDetailResult", "true");
@@ -284,15 +264,11 @@ public sealed class SvcPostTests
         Soap12FunctionalSupport.AssertChildValue(detail, LegacyBodyBuilders.Service + "PartnerId", "3");
 
         var xmlNodeResponse = client.GetXmlNodeResponseBody(envelope, soapXmlBodyTag: "s:Body");
-        Assert.IsTrue(
-            xmlNodeResponse.IsSuccess,
-            $"An explicit s:Body tag must extract the payload from an s-prefixed envelope. Got: {NegativeTestSupport.Describe(xmlNodeResponse)}");
-        Assert.IsNotNull(xmlNodeResponse.Response, "A successful extraction must carry a node.");
+        Assert.IsTrue(xmlNodeResponse.IsSuccess, NegativeTestSupport.Describe(xmlNodeResponse));
+        Assert.IsNotNull(xmlNodeResponse.Response);
 
         var xNodeResponse = client.GetXNodeResponseBody(envelope, soapXmlBodyTag: "s:Body");
-        Assert.IsTrue(
-            xNodeResponse.IsSuccess,
-            $"An explicit s:Body tag must also work for GetXNodeResponseBody. Got: {NegativeTestSupport.Describe(xNodeResponse)}");
-        Assert.IsNotNull(xNodeResponse.Response, "A successful extraction must carry a node.");
+        Assert.IsTrue(xNodeResponse.IsSuccess, NegativeTestSupport.Describe(xNodeResponse));
+        Assert.IsNotNull(xNodeResponse.Response);
     }
 }

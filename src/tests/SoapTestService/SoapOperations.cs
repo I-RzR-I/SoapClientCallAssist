@@ -7,14 +7,18 @@ public static class SoapOperations
     public const int MaxDelayMilliseconds = 30000;
 
     public static async Task<SoapResult> InvokeAsync(string operation, SoapArguments arguments,
-        CancellationToken cancellationToken)
+        SoapCallerContext caller, CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(arguments);
+        ArgumentNullException.ThrowIfNull(caller);
 
         switch (operation)
         {
             case "HelloWorld":
                 return HelloWorld(operation);
+
+            case "WhoAmI":
+                return WhoAmI(operation, caller);
 
             case "EchoValue":
                 return EchoValue(operation, arguments);
@@ -50,6 +54,18 @@ public static class SoapOperations
 
     private static SoapResult HelloWorld(string operation)
         => Respond(operation, new XElement(SoapNames.Service + "HelloWorldResult", "Hello World"));
+
+    private static SoapResult WhoAmI(string operation, SoapCallerContext caller)
+        => Respond(
+            operation,
+            new XElement(
+                SoapNames.Service + "WhoAmIResult",
+                new XElement(SoapNames.Service + "Scheme", caller.Scheme),
+                new XElement(SoapNames.Service + "ClientCertificateSha256", caller.ClientCertificateSha256 ?? string.Empty),
+                new XElement(SoapNames.Service + "ClientCertificateSubject", caller.ClientCertificateSubject ?? string.Empty),
+                new XElement(SoapNames.Service + "IdentityName", caller.IdentityName ?? string.Empty),
+                new XElement(SoapNames.Service + "AuthenticationType", caller.AuthenticationType ?? string.Empty),
+                new XElement(SoapNames.Service + "IsAuthenticated", caller.IsAuthenticated)));
 
     private static SoapResult EchoValue(string operation, SoapArguments arguments)
     {

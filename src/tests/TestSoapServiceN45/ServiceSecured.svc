@@ -1,0 +1,1 @@
+﻿<%@ ServiceHost Language="C#" Debug="true" Service="TestSoapServiceN45.ServiceSecured" CodeBehind="ServiceSecured.svc.cs" Factory="TestSoapServiceN45.Security.SecuredServiceHostFactory" %>

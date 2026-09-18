@@ -1,5 +1,5 @@
 ﻿using SoapClientCallAssist.Attributes;
-using SoapClientCallAssistTests.Soap12.Helpers;
+using SoapClientCallAssistTests.Soap12.Helpers.Mapper;
 
 namespace SoapClientCallAssistTests.Soap12.Models;
 

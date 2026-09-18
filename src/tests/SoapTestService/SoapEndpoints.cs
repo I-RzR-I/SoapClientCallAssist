@@ -69,6 +69,7 @@ public static class SoapEndpoints
         return await SoapOperations.InvokeAsync(
             operationElement.Name.LocalName,
             SoapArguments.FromElement(operationElement),
+            SoapCallerContext.From(context),
             context.RequestAborted);
     }
 
@@ -100,6 +101,7 @@ public static class SoapEndpoints
         return await SoapOperations.InvokeAsync(
             operation,
             SoapArguments.FromRequestLine(named, positional),
+            SoapCallerContext.From(context),
             context.RequestAborted);
     }
 

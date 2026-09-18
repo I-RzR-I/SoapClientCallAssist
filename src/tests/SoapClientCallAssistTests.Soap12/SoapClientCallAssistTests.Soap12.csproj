@@ -10,6 +10,8 @@
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
 		<PackageReference Include="MSTest.TestAdapter" Version="3.6.1" />
 		<PackageReference Include="MSTest.TestFramework" Version="3.6.1" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.Negotiate" Version="8.0.16" />
+		<PackageReference Include="Microsoft.IdentityModel.Tokens.Saml" Version="6.17.0" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -17,8 +19,14 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<None Update="Interop\JavaVerify.java" CopyToOutputDirectory="PreserveNewest" />
+		<None Update="TestData\WireGolden\*.wire" CopyToOutputDirectory="PreserveNewest" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\..\SoapClientCallAssist\SoapClientCallAssist.csproj" />
 		<ProjectReference Include="..\SoapTestService\SoapTestService.csproj" />
+		<ProjectReference Include="..\SoapClientCallAssistTests.Common\SoapClientCallAssistTests.Common.csproj" />
 	</ItemGroup>
 
 </Project>

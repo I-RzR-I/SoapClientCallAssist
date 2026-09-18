@@ -1,20 +1,4 @@
-﻿// ***********************************************************************
-//  Assembly         : RzR.Shared.Services.SoapClientCallAssistTests
-//  Author           : RzR
-//  Created On       : 2024-09-17 21:26
-// 
-//  Last Modified By : RzR
-//  Last Modified On : 2024-09-17 21:26
-// ***********************************************************************
-//  <copyright file="Product.cs" company="">
-//   Copyright (c) RzR. All rights reserved.
-//  </copyright>
-// 
-//  <summary>
-//  </summary>
-// ***********************************************************************
-
-using System.Runtime.Serialization;
+﻿using System.Runtime.Serialization;
 
 namespace SoapClientCallAssistTests.Dto
 {

@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="Build">
+    <Message Importance="high" Text="TestSoapServiceN45 is a .NET Framework 4.5 web project and is skipped under the dotnet CLI; build it with Visual Studio or MSBuild.exe (its bin\ is what the legacy SoapClientCallAssistTests suite hosts in IIS Express)." />
+  </Target>
+</Project>

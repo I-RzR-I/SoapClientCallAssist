@@ -7,8 +7,6 @@ using TestSoapServiceN45.Dto;
 
 namespace TestSoapServiceN45
 {
-    // NOTE: You can use the "Rename" command on the "Refactor" menu to change the class name "ServiceSvc" in code, svc and config file together.
-    // NOTE: In order to launch WCF Test Client for testing this service, please select ServiceSvc.svc or ServiceSvc.svc.cs at the Solution Explorer and start debugging.
 
     public class ServiceSvc : IServiceSvc
     {

@@ -2,7 +2,7 @@
 #nullable disable
 
 using SoapClientCallAssist.Attributes;
-using SoapClientCallAssistTests.Soap12.Helpers;
+using SoapClientCallAssistTests.Soap12.Helpers.Mapper;
 using System.Runtime.Serialization;
 
 namespace SoapClientCallAssistTests.Soap12.Models;

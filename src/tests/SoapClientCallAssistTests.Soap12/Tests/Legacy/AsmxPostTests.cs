@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SoapClientCallAssist.Enums;
-using SoapClientCallAssistTests.Soap12.Helpers;
+using SoapClientCallAssistTests.Soap12.Helpers.Protocol;
+using SoapClientCallAssistTests.Soap12.Helpers.Results;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -25,10 +26,7 @@ public sealed class AsmxPostTests
 
         var payload = CrossProtocolSupport.GetBodyChild(Protocol, envelope);
 
-        Assert.AreEqual(
-            (LegacyBodyBuilders.Service + "HelloWorldResponse").ToString(),
-            payload.Name.ToString(),
-            $"Expected the conventional HelloWorldResponse element. Envelope was: {envelope}");
+        Assert.AreEqual((LegacyBodyBuilders.Service + "HelloWorldResponse").ToString(), payload.Name.ToString(), $"{envelope}");
         SoapAssert.AssertElementValue(payload, "HelloWorldResult", "Hello World");
     }
 
@@ -41,18 +39,15 @@ public sealed class AsmxPostTests
         using var request = CrossProtocolSupport.BuildPost(Protocol, client, Soap12FunctionalSupport.HelloWorldBody(), correlationId);
         using var response = Soap12FunctionalSupport.Unwrap(
             await client.SendRequestAsync(request),
-            $"SendRequestAsync(HelloWorld, {Protocol})");
+            $"SendRequestAsync {Protocol}");
         var envelope = await response.Content.ReadAsStringAsync();
 
         CrossProtocolSupport.AssertRequestWasOnTheWireForProtocol(Protocol, correlationId);
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, $"Response envelope was: {envelope}");
+        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, $"{envelope}");
 
         var payload = CrossProtocolSupport.GetBodyChild(Protocol, envelope);
 
-        Assert.AreEqual(
-            (LegacyBodyBuilders.Service + "HelloWorldResponse").ToString(),
-            payload.Name.ToString(),
-            $"Expected the conventional HelloWorldResponse element. Envelope was: {envelope}");
+        Assert.AreEqual((LegacyBodyBuilders.Service + "HelloWorldResponse").ToString(), payload.Name.ToString(), $"{envelope}");
         SoapAssert.AssertElementValue(payload, "HelloWorldResult", "Hello World");
     }
 
@@ -131,19 +126,12 @@ public sealed class AsmxPostTests
         SoapAssert.AssertElementValue(payload, "IsValidResult", "1");
 
         var faultCheck = client.CheckBodyForFaultCode(envelope);
-        Assert.IsTrue(
-            faultCheck.IsSuccess,
-            $"A fault-free IsValid response must report success. Got: {NegativeTestSupport.Describe(faultCheck)}");
+        Assert.IsTrue(faultCheck.IsSuccess, NegativeTestSupport.Describe(faultCheck));
 
         var xmlNode = client.GetXmlNodeResponseBody(envelope);
-        Assert.IsTrue(
-            xmlNode.IsSuccess,
-            $"GetXmlNodeResponseBody must extract the payload from an ASMX-style soap:Body. Got: {NegativeTestSupport.Describe(xmlNode)}");
-        Assert.IsNotNull(xmlNode.Response, "A successful extraction must carry a node.");
-        Assert.AreEqual(
-            "IsValidResponse",
-            xmlNode.Response!.LocalName,
-            $"Expected the IsValidResponse element. Envelope was: {envelope}");
+        Assert.IsTrue(xmlNode.IsSuccess, NegativeTestSupport.Describe(xmlNode));
+        Assert.IsNotNull(xmlNode.Response);
+        Assert.AreEqual("IsValidResponse", xmlNode.Response!.LocalName, $"{envelope}");
     }
 
     [TestMethod]
@@ -158,22 +146,17 @@ public sealed class AsmxPostTests
             new[] { LegacyBodyBuilders.AddRecordWithDetailEmpty() },
             correlationId);
 
-        using var response = Soap12FunctionalSupport.Unwrap(
+        using var response = Soap12FunctionalSupport.UnwrapRejected(
             client.SendRequest(request),
-            $"SendRequest(AddRecordWithDetail, missing product, {Protocol})");
+            NegativeTestSupport.HttpSoapFaultCode,
+            $"SendRequest {Protocol}");
         var envelope = response.Content.ReadAsStringAsync().GetAwaiter().GetResult();
 
-        Assert.AreEqual(
-            HttpStatusCode.InternalServerError,
-            response.StatusCode,
-            $"A missing required argument must fault with HTTP 500. Envelope was: {envelope}");
+        Assert.AreEqual(HttpStatusCode.InternalServerError, response.StatusCode, $"{envelope}");
 
         var faultCheck = client.CheckBodyForFaultCode(envelope);
-        Assert.IsFalse(faultCheck.IsSuccess, $"A fault response must be classified as a failure. Envelope was: {envelope}");
-        StringAssert.Contains(
-            NegativeTestSupport.FirstMessageInfo(faultCheck),
-            "Argument 'product' is required.",
-            $"The fault reason must reach the caller. Envelope was: {envelope}");
+        Assert.IsFalse(faultCheck.IsSuccess, $"{envelope}");
+        StringAssert.Contains(NegativeTestSupport.FirstMessageInfo(faultCheck), "Argument 'product' is required.", $"{envelope}");
     }
 
     [TestMethod]

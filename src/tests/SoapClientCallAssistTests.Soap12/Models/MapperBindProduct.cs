@@ -3,7 +3,7 @@
 
 using SoapClientCallAssist.Attributes;
 using SoapClientCallAssistTests.Soap12.Enums;
-using SoapClientCallAssistTests.Soap12.Helpers;
+using SoapClientCallAssistTests.Soap12.Helpers.Mapper;
 using System;
 using System.Collections.Generic;
 

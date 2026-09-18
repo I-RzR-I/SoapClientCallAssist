@@ -10,13 +10,9 @@ using TestSoapServiceN45.Dto;
 
 namespace TestSoapServiceN45
 {
-    /// <summary>
-    /// Summary description for ServiceAsmx
-    /// </summary>
     [WebService(Namespace = "http://SoapClientCallAssist.local/")]
     [WebServiceBinding(ConformsTo = WsiProfiles.BasicProfile1_1)]
     [System.ComponentModel.ToolboxItem(false)]
-    // To allow this Web Service to be called from script, using ASP.NET AJAX, uncomment the following line. 
     [System.Web.Script.Services.ScriptService]
     public class ServiceAsmx : System.Web.Services.WebService
     {

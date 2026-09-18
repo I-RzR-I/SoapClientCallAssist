@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SoapClientCallAssist.Enums;
-using SoapClientCallAssistTests.Soap12.Helpers;
+using SoapClientCallAssistTests.Soap12.Helpers.Protocol;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -27,11 +27,11 @@ public sealed class SvcGetTests
 
         using var response = Soap12FunctionalSupport.Unwrap(
             await client.SendRequestAsync(request),
-            $"SendRequestAsync(GET IsValid, {Protocol})");
+            $"SendRequestAsync {Protocol}");
         var envelope = await response.Content.ReadAsStringAsync();
 
         CrossProtocolSupport.AssertRequestWasOnTheWireForProtocol(Protocol, correlationId);
-        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, $"Response envelope was: {envelope}");
+        Assert.AreEqual(HttpStatusCode.OK, response.StatusCode, $"{envelope}");
 
         var payload = CrossProtocolSupport.GetBodyChild(Protocol, envelope);
         SoapAssert.AssertElementValue(payload, "IsValidResult", "1");

@@ -11,7 +11,6 @@ using TestSoapServiceN45.Dto;
 
 namespace TestSoapServiceN45
 {
-    // NOTE: You can use the "Rename" command on the "Refactor" menu to change the interface name "IServiceSvc" in both code and config file together.
     [ServiceContract(Namespace = "http://SoapClientCallAssist.local/")]
     public interface IServiceSvc
     {
