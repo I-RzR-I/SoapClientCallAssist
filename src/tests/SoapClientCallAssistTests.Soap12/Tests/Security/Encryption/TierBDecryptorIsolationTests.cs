@@ -15,9 +15,9 @@ namespace SoapClientCallAssistTests.Soap12.Tests.Security.Encryption;
 public sealed class TierBDecryptorIsolationTests
 {
 
-    private const string DecryptorTypeName = "SoapClientCallAssist.Security.WsSecurityResponseDecryptor";
+    private const string DecryptorTypeName = "SoapClientCallAssist.Security.WsSecurity.WsSecurityResponseDecryptor";
 
-    private const string VerifierTypeName = "SoapClientCallAssist.Security.WsSecuritySymmetricResponseVerifier";
+    private const string VerifierTypeName = "SoapClientCallAssist.Security.WsSecurity.WsSecuritySymmetricResponseVerifier";
 
     private static readonly Dictionary<short, OpCode> OpCodes = typeof(OpCodes)
         .GetFields(BindingFlags.Public | BindingFlags.Static)

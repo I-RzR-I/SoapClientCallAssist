@@ -143,7 +143,7 @@ public sealed class WsSecurityStatelessnessTests
     [TestMethod]
     public void PerBuildTypes_DeclareNoRawSecretField_Test()
     {
-        var builder = WsSecurityFoundationTestSupport.LibraryType("SoapClientCallAssist.Security.WsSecurityHeaderBuilder");
+        var builder = WsSecurityFoundationTestSupport.LibraryType("SoapClientCallAssist.Security.WsSecurity.WsSecurityHeaderBuilder");
 
         var offending = builder.GetFields(Declared)
             .Where(field => !field.IsStatic)
@@ -179,7 +179,7 @@ public sealed class WsSecurityStatelessnessTests
 
     private static IEnumerable<Type> SweptTypes()
         => WsSecurityFoundationTestSupport.LibraryAssembly.GetTypes()
-            .Where(type => type.Namespace == SecurityNamespace || ClientTypes.Contains(type))
+            .Where(type => type.Namespace == SecurityNamespace || (type.Namespace?.StartsWith(SecurityNamespace + ".", StringComparison.Ordinal) ?? false) || ClientTypes.Contains(type))
             .Where(type => !type.IsDefined(typeof(CompilerGeneratedAttribute), false));
 
     private static IEnumerable<string> StaticOffenders(Type type)
