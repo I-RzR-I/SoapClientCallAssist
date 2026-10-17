@@ -1,3 +1,7 @@
+### **v2.1.0.8463** [[RzR](mailto:108324929+I-RzR-I@users.noreply.github.com)] 17-10-2026
+* [390faf9] (RzR) -> Auto commit uncommited files
+* [6bd4712] (RzR) -> Update the reference packages version.
+
 ### **v2.0.0.380** [[RzR](mailto:108324929+I-RzR-I@users.noreply.github.com)] 19-09-2026
 * [bfb3d95] (RzR) -> Auto commit uncommited files
 * [4024462] (RzR) -> Add new package pack scripts.
